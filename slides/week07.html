@@ -456,6 +456,92 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg);
   border-radius: .45rem; padding: .8rem 1.1rem;
   font-family: var(--mono); font-size: .78rem; line-height: 1.7;
   color: var(--text); white-space: pre; margin: .5rem 0 .3rem;
+  overflow-x: auto;
+}
+
+/* ─── RESPONSIVE — TABLET (≤ 768px) ────────────────── */
+@media (max-width: 768px) {
+  /* Header */
+  .slide-header { padding: 1.1rem 1.4rem .9rem; gap: .7rem; }
+  .slide-header h1 { font-size: 1.15rem; }
+  .slide-num { font-size: .7rem; white-space: nowrap; }
+
+  /* Body */
+  .slide-body { padding: 1.2rem 1.4rem 5.5rem; gap: 1rem; }
+
+  /* Grids → 1열 */
+  .grid-2 { grid-template-columns: 1fr; }
+  .grid-3 { grid-template-columns: 1fr; }
+  [style*="grid-column"] { grid-column: span 1 !important; }
+
+  /* VS split → 세로 */
+  .vs-split { grid-template-columns: 1fr; }
+  .vs-divider { flex-direction: row; padding: 0; justify-content: center; }
+
+  /* Guide grid → 2열 */
+  .guide-grid { grid-template-columns: 1fr 1fr; }
+
+  /* Title slide */
+  #slide-title { padding: 0; justify-content: flex-start; align-items: stretch; }
+  #slide-title > div { padding: 2rem 1.5rem 2rem !important; }
+  .title-main { font-size: clamp(1.7rem, 6vw, 2.4rem); }
+  .title-sub { font-size: .9rem; margin-bottom: 1.5rem; }
+  .title-tags { margin-bottom: 2rem; }
+  .title-info { flex-direction: column; gap: .35rem; }
+
+  /* Code blocks — 가로 스크롤 */
+  .code-block { font-size: .75rem; overflow-x: auto; white-space: pre; }
+  .q-code-block { font-size: .73rem; }
+
+  /* Tables */
+  .tbl { font-size: .74rem; }
+  .tbl th, .tbl td { padding: .5rem .65rem; }
+
+  /* Cards */
+  .card { padding: 1rem 1.1rem; }
+
+  /* Note */
+  .note { font-size: .68rem; }
+
+  /* Nav — 터치 타깃 크게 */
+  #nav { bottom: 1.2rem; padding: .55rem 1.1rem; }
+  #nav button { font-size: 1.25rem; padding: .5rem .9rem; }
+  #slide-counter { font-size: .75rem; min-width: 3.5rem; }
+
+  /* 키보드 힌트 숨김 */
+  #kbd-hint { display: none; }
+
+  /* Quiz options — 2열 */
+  .quiz-options { gap: .4rem; }
+  .opt-btn { flex: 1 0 calc(50% - .2rem); font-size: .73rem; }
+
+  /* Quiz input row */
+  .quiz-input-row { flex-wrap: wrap; }
+  .quiz-input { min-width: 100%; order: 1; }
+  .quiz-hint-btn { order: 2; }
+  .quiz-submit-btn { order: 3; flex: 1; }
+}
+
+/* ─── RESPONSIVE — MOBILE (≤ 480px) ────────────────── */
+@media (max-width: 480px) {
+  .slide-header h1 { font-size: 1rem; }
+  .slide-body { padding: 1rem 1rem 5.5rem; gap: .85rem; }
+
+  /* Guide grid → 1열 */
+  .guide-grid { grid-template-columns: 1fr; }
+
+  /* Title */
+  #slide-title > div { padding: 1.5rem 1rem 1.5rem !important; }
+  .title-main { font-size: 1.7rem; }
+
+  /* Code */
+  .code-block { font-size: .7rem; padding: .8rem 1rem; }
+
+  /* Quiz options → 1열 */
+  .opt-btn { flex: 1 0 100%; }
+
+  /* Quiz input buttons → 전체 너비 */
+  .quiz-hint-btn { flex: 1; text-align: center; }
 }
 </style>
 </head>
@@ -1466,6 +1552,22 @@ df = pd.<span class="fn">read_csv</span>(<span class="str">'data.csv'</span>)
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown')  { e.preventDefault(); goTo(current + 1); }
     else if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp') { e.preventDefault(); goTo(current - 1); }
   });
+
+  // 터치 스와이프 (모바일/태블릿)
+  var touchStartX = 0, touchStartY = 0;
+  document.addEventListener('touchstart', function (e) {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+  document.addEventListener('touchend', function (e) {
+    var dx = e.changedTouches[0].clientX - touchStartX;
+    var dy = e.changedTouches[0].clientY - touchStartY;
+    // 수평 스와이프가 수직 스크롤보다 클 때만 슬라이드 전환
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 48) {
+      if (dx < 0) goTo(current + 1);  // 왼쪽 스와이프 → 다음
+      else        goTo(current - 1);  // 오른쪽 스와이프 → 이전
+    }
+  }, { passive: true });
 
   document.getElementById('progress-bar').style.width = (1 / total * 100) + '%';
 
