@@ -1,0 +1,1613 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>파이썬 기본문법 총정리 — Week 7</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+KR:wght@300;400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ─── RESET & BASE ─────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:      #f4f6fb;
+  --surface: #eaecf4;
+  --card:    #ffffff;
+  --border:  #d8dce8;
+  --accent:  #0d9488;
+  --accent2: #d97706;
+  --accent3: #dc2626;
+  --accent4: #16a34a;
+  --accent5: #7c3aed;
+  --text:    #1e293b;
+  --muted:   #64748b;
+  --mono:    'IBM Plex Mono', monospace;
+  --sans:    'IBM Plex Sans KR', sans-serif;
+}
+
+html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg); }
+
+/* ─── SLIDE CONTAINER ──────────────────────────────── */
+#deck { width: 100vw; height: 100vh; position: relative; }
+
+.slide {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  opacity: 0; pointer-events: none;
+  transition: opacity .45s ease, transform .45s ease;
+  transform: translateY(24px);
+  overflow: hidden;
+}
+.slide.active {
+  opacity: 1; pointer-events: all; transform: translateY(0);
+}
+.slide.exit {
+  opacity: 0; transform: translateY(-24px);
+}
+
+/* ─── SLIDE HEADER ─────────────────────────────────── */
+.slide-header {
+  padding: 2.2rem 3.5rem 1.4rem;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: flex-end; gap: 1.2rem;
+  flex-shrink: 0;
+  background: var(--card);
+}
+.slide-header .tag {
+  font-family: var(--mono); font-size: .72rem;
+  color: var(--accent); letter-spacing: .12em;
+  text-transform: uppercase; padding-bottom: .15rem;
+}
+.slide-header h1 {
+  font-family: var(--sans); font-size: 1.6rem; font-weight: 700;
+  color: var(--text); line-height: 1.2;
+}
+.slide-header h1 span { color: var(--accent); }
+.slide-num {
+  margin-left: auto; font-family: var(--mono); font-size: .85rem;
+  color: var(--muted);
+}
+
+/* ─── SLIDE BODY ───────────────────────────────────── */
+.slide-body {
+  flex: 1; padding: 2rem 3.5rem 1.5rem;
+  overflow-y: auto; display: flex; flex-direction: column; gap: 1.4rem;
+  background: var(--bg);
+}
+.slide-body::-webkit-scrollbar { width: 4px; }
+.slide-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* ─── NAV ──────────────────────────────────────────── */
+#nav {
+  position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%);
+  display: flex; align-items: center; gap: .8rem;
+  background: rgba(255,255,255,.92); border: 1px solid var(--border);
+  border-radius: 3rem; padding: .6rem 1.2rem;
+  backdrop-filter: blur(12px); z-index: 100;
+  box-shadow: 0 4px 20px rgba(0,0,0,.08);
+}
+#nav button {
+  background: none; border: none; cursor: pointer;
+  color: var(--muted); font-size: 1.1rem; padding: .3rem .6rem;
+  border-radius: .4rem; transition: color .2s, background .2s;
+  font-family: var(--mono);
+}
+#nav button:hover { color: var(--accent); background: rgba(13,148,136,.08); }
+#nav button:disabled { opacity: .25; cursor: default; }
+#slide-counter {
+  font-family: var(--mono); font-size: .78rem; color: var(--muted);
+  min-width: 4rem; text-align: center;
+}
+#progress-bar {
+  position: fixed; top: 0; left: 0; height: 3px;
+  background: var(--accent); transition: width .35s ease;
+  z-index: 200;
+}
+
+/* ─── KEYBOARD HINT ────────────────────────────────── */
+#kbd-hint {
+  position: fixed; bottom: 2rem; right: 2.5rem;
+  font-family: var(--mono); font-size: .65rem; color: var(--muted);
+  opacity: .5;
+}
+
+/* ─── COMPONENTS ───────────────────────────────────── */
+
+/* Grid layouts */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.2rem; }
+
+/* Card */
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: .75rem; padding: 1.4rem 1.6rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,.04);
+}
+.card-title {
+  font-family: var(--mono); font-size: .72rem; color: var(--accent);
+  letter-spacing: .1em; text-transform: uppercase; margin-bottom: .8rem;
+}
+.card-title.amber { color: var(--accent2); }
+.card-title.red   { color: var(--accent3); }
+.card-title.green { color: var(--accent4); }
+.card-title.purple{ color: var(--accent5); }
+
+/* Code block */
+.code-block {
+  background: #f8fafc; border: 1px solid #e2e8f0;
+  border-radius: .5rem; padding: 1.1rem 1.4rem;
+  font-family: var(--mono); font-size: .82rem; line-height: 1.75;
+  color: var(--text); white-space: pre;
+}
+.kw  { color: #7c3aed; }   /* keyword - purple */
+.fn  { color: #0d9488; }   /* function - teal */
+.str { color: #15803d; }   /* string - green */
+.cm  { color: #94a3b8; font-style: italic; } /* comment */
+.num { color: #b45309; }   /* number - amber */
+.op  { color: #dc2626; }   /* operator / error - red */
+.ok  { color: #16a34a; }   /* success - green */
+.hl  { color: #0d9488; }   /* highlight - teal */
+
+/* Table */
+.tbl { width: 100%; border-collapse: collapse; font-family: var(--sans); font-size: .82rem; }
+.tbl th {
+  background: #f1f5f9; color: var(--accent);
+  font-family: var(--mono); font-size: .7rem; letter-spacing: .1em;
+  text-transform: uppercase; padding: .7rem 1rem; text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.tbl td {
+  padding: .65rem 1rem; color: var(--text);
+  border-bottom: 1px solid rgba(216,220,232,.7);
+}
+.tbl tr:last-child td { border-bottom: none; }
+.tbl tr:hover td { background: rgba(13,148,136,.04); }
+.tbl code {
+  font-family: var(--mono); font-size: .78rem;
+  background: #f1f5f9; padding: .1rem .4rem; border-radius: .3rem;
+  color: var(--accent);
+}
+.badge {
+  display: inline-block; font-family: var(--mono); font-size: .65rem;
+  padding: .15rem .5rem; border-radius: 1rem; font-weight: 600;
+}
+.badge.y { background: rgba(217,119,6,.12); color: var(--accent2); border: 1px solid rgba(217,119,6,.25); }
+.badge.r { background: rgba(220,38,38,.1); color: var(--accent3); border: 1px solid rgba(220,38,38,.25); }
+.badge.g { background: rgba(22,163,74,.1); color: var(--accent4); border: 1px solid rgba(22,163,74,.25); }
+.badge.b { background: rgba(13,148,136,.1);  color: var(--accent);  border: 1px solid rgba(13,148,136,.25); }
+.badge.p { background: rgba(124,58,237,.1); color: var(--accent5); border: 1px solid rgba(124,58,237,.25); }
+
+/* Flow row */
+.flow {
+  display: flex; align-items: center; gap: .6rem;
+  flex-wrap: wrap; justify-content: center;
+}
+.flow-item {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: .5rem; padding: .65rem 1.1rem;
+  font-family: var(--mono); font-size: .8rem; color: var(--text);
+  text-align: center; min-width: 5.5rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,.04);
+}
+.flow-item .fi-label { color: var(--accent); font-size: .65rem; display: block; margin-bottom: .2rem; }
+.flow-arrow { color: var(--muted); font-size: 1.1rem; }
+
+/* Subsection label */
+.sub-label {
+  font-family: var(--mono); font-size: .68rem; color: var(--muted);
+  letter-spacing: .1em; text-transform: uppercase; margin-bottom: .5rem;
+}
+
+/* ─── QUIZ COMPONENT (toggle-reveal style for overview) ─── */
+.quiz-block { display: flex; flex-direction: column; gap: 1.2rem; }
+.quiz-item {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: .75rem; padding: 1.2rem 1.4rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,.04);
+}
+.quiz-question {
+  font-family: var(--mono); font-size: .8rem; color: var(--text);
+  margin-bottom: .8rem; line-height: 1.6; white-space: pre;
+}
+.quiz-btn {
+  background: rgba(13,148,136,.1); border: 1px solid rgba(13,148,136,.3);
+  color: var(--accent); font-family: var(--mono); font-size: .72rem;
+  padding: .45rem 1rem; border-radius: .4rem; cursor: pointer;
+  transition: background .2s, transform .1s;
+}
+.quiz-btn:hover { background: rgba(13,148,136,.2); transform: translateY(-1px); }
+.quiz-answer {
+  margin-top: .8rem; padding: .8rem 1rem;
+  background: #f8fafc; border-radius: .5rem;
+  border-left: 3px solid var(--accent4);
+  font-family: var(--mono); font-size: .8rem; line-height: 1.7;
+  display: none; white-space: pre; color: var(--text);
+}
+.quiz-answer.visible { display: block; animation: fadeIn .3s ease; }
+.quiz-level {
+  font-family: var(--mono); font-size: .62rem; letter-spacing: .1em;
+  padding: .12rem .5rem; border-radius: 1rem; margin-bottom: .6rem;
+  display: inline-block;
+}
+.quiz-level.easy   { background: rgba(22,163,74,.1); color: var(--accent4); border: 1px solid rgba(22,163,74,.25); }
+.quiz-level.medium { background: rgba(217,119,6,.1);  color: var(--accent2); border: 1px solid rgba(217,119,6,.25); }
+.quiz-level.hard   { background: rgba(220,38,38,.1); color: var(--accent3); border: 1px solid rgba(220,38,38,.25); }
+
+/* ─── INTERACTIVE QUIZ COMPONENTS ──────────────────── */
+.quiz-score-bar {
+  display: flex; align-items: center; gap: .8rem;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: .6rem; padding: .7rem 1.2rem;
+  font-family: var(--mono); font-size: .78rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,.04);
+}
+.score-label { color: var(--muted); }
+.score-value {
+  color: var(--accent); font-weight: 600; font-size: .88rem;
+}
+.score-reset {
+  margin-left: auto;
+  background: none; border: 1px solid var(--border);
+  color: var(--muted); font-family: var(--mono); font-size: .68rem;
+  padding: .25rem .7rem; border-radius: .35rem; cursor: pointer;
+  transition: color .2s, border-color .2s;
+}
+.score-reset:hover { color: var(--accent3); border-color: var(--accent3); }
+
+/* Multiple choice options */
+.quiz-options {
+  display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .6rem;
+}
+.opt-btn {
+  background: #f8fafc; border: 1.5px solid var(--border);
+  color: var(--text); font-family: var(--mono); font-size: .76rem;
+  padding: .45rem 1rem; border-radius: .4rem; cursor: pointer;
+  transition: background .15s, border-color .15s, transform .1s;
+  text-align: left;
+}
+.opt-btn:hover:not(:disabled) {
+  background: rgba(13,148,136,.06);
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+.opt-btn:disabled { cursor: default; }
+.opt-btn.opt-correct {
+  background: rgba(22,163,74,.1); border-color: var(--accent4);
+  color: var(--accent4); font-weight: 600;
+}
+.opt-btn.opt-wrong {
+  background: rgba(220,38,38,.08); border-color: var(--accent3);
+  color: var(--accent3); text-decoration: line-through;
+}
+
+/* Feedback messages */
+.quiz-feedback {
+  margin-top: .65rem; font-family: var(--mono); font-size: .78rem;
+  padding: .5rem .9rem; border-radius: .4rem;
+  display: none;
+}
+.quiz-feedback.visible { display: block; animation: fadeIn .25s ease; }
+.quiz-feedback.correct {
+  background: rgba(22,163,74,.1); color: var(--accent4);
+  border-left: 3px solid var(--accent4);
+}
+.quiz-feedback.wrong {
+  background: rgba(220,38,38,.08); color: var(--accent3);
+  border-left: 3px solid var(--accent3);
+}
+
+/* Explanation (shown after answer) */
+.quiz-explain {
+  margin-top: .5rem; padding: .7rem 1rem;
+  background: #f8fafc; border-radius: .5rem;
+  border-left: 3px solid var(--border);
+  font-family: var(--mono); font-size: .76rem; line-height: 1.7;
+  color: var(--muted); display: none;
+}
+.quiz-explain.visible { display: block; animation: fadeIn .3s ease; }
+.quiz-explain .expl-answer { color: var(--text); font-weight: 600; }
+
+/* Text input quiz */
+.quiz-input-row {
+  display: flex; gap: .5rem; margin-top: .6rem; align-items: center;
+}
+.quiz-input {
+  font-family: var(--mono); font-size: .8rem;
+  background: #f8fafc; border: 1.5px solid var(--border);
+  color: var(--text); padding: .45rem .8rem; border-radius: .4rem;
+  outline: none; transition: border-color .2s;
+  flex: 1; min-width: 0;
+}
+.quiz-input:focus { border-color: var(--accent); }
+.quiz-input:disabled { background: #f1f5f9; color: var(--muted); }
+.quiz-submit-btn {
+  background: var(--accent); border: none;
+  color: white; font-family: var(--mono); font-size: .74rem;
+  padding: .45rem 1rem; border-radius: .4rem; cursor: pointer;
+  transition: opacity .2s; flex-shrink: 0;
+}
+.quiz-submit-btn:hover:not(:disabled) { opacity: .88; }
+.quiz-submit-btn:disabled { opacity: .45; cursor: default; }
+.quiz-hint-btn {
+  background: none; border: 1px solid var(--border);
+  color: var(--muted); font-family: var(--mono); font-size: .68rem;
+  padding: .3rem .7rem; border-radius: .35rem; cursor: pointer;
+  transition: color .2s; flex-shrink: 0; margin-left: .2rem;
+}
+.quiz-hint-btn:hover { color: var(--accent2); border-color: var(--accent2); }
+
+/* Hint box */
+.quiz-hint {
+  margin-top: .5rem; padding: .55rem .9rem;
+  background: rgba(217,119,6,.06); border-left: 3px solid var(--accent2);
+  font-family: var(--mono); font-size: .74rem; color: var(--accent2);
+  border-radius: 0 .4rem .4rem 0; display: none;
+}
+.quiz-hint.visible { display: block; animation: fadeIn .2s ease; }
+
+/* ─── TITLE SLIDE ──────────────────────────────────── */
+#slide-title {
+  background: var(--bg);
+  justify-content: center; align-items: flex-start;
+  padding: 4rem 4rem 2rem;
+}
+.title-eyebrow {
+  font-family: var(--mono); font-size: .8rem; color: var(--accent);
+  letter-spacing: .15em; text-transform: uppercase; margin-bottom: 1.4rem;
+}
+.title-main {
+  font-family: var(--sans); font-size: 3.6rem; font-weight: 700;
+  color: var(--text); line-height: 1.1; margin-bottom: .6rem;
+}
+.title-main em { color: var(--accent); font-style: normal; }
+.title-sub {
+  font-family: var(--sans); font-size: 1.15rem; font-weight: 300;
+  color: var(--muted); margin-bottom: 3rem;
+}
+.title-tags {
+  display: flex; gap: .7rem; flex-wrap: wrap; margin-bottom: 3.5rem;
+}
+.title-tag {
+  font-family: var(--mono); font-size: .7rem;
+  padding: .3rem .8rem; border-radius: .3rem;
+  border: 1px solid var(--border); color: var(--muted);
+  background: var(--card);
+}
+.title-info {
+  font-family: var(--mono); font-size: .72rem; color: var(--muted);
+  display: flex; gap: 2rem;
+}
+.title-info span { color: var(--text); }
+
+/* ─── GUIDE CARD ───────────────────────────────────── */
+.guide-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;
+}
+.guide-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: .75rem; padding: 1.2rem 1.3rem;
+  display: flex; flex-direction: column; gap: .5rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,.04);
+}
+.guide-card .gc-icon { font-size: 1.3rem; margin-bottom: .2rem; }
+.guide-card .gc-when {
+  font-family: var(--mono); font-size: .68rem; color: var(--muted);
+}
+.guide-card .gc-arrow { color: var(--accent); font-family: var(--mono); font-size: .72rem; }
+.guide-card .gc-what {
+  font-family: var(--mono); font-size: .8rem; color: var(--accent);
+  font-weight: 600;
+}
+
+/* ─── ANIMATIONS ───────────────────────────────────── */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ─── VS SPLIT ─────────────────────────────────────── */
+.vs-split {
+  display: grid; grid-template-columns: 1fr auto 1fr; gap: 1rem; align-items: start;
+}
+.vs-divider {
+  display: flex; flex-direction: column; align-items: center;
+  gap: .4rem; padding-top: 1.2rem;
+}
+.vs-badge {
+  font-family: var(--mono); font-size: .65rem; color: var(--muted);
+  padding: .3rem .6rem; border: 1px solid var(--border); border-radius: 1rem;
+  background: var(--card);
+}
+
+/* ─── ERROR TABLE HIGHLIGHT ────────────────────────── */
+.err-row td:first-child code { color: var(--accent3); }
+
+/* ─── NEXT WEEK CARD ───────────────────────────────── */
+.next-card {
+  background: linear-gradient(135deg, rgba(13,148,136,.06), rgba(124,58,237,.06));
+  border: 1px solid rgba(13,148,136,.2); border-radius: .75rem;
+  padding: 2rem 2.4rem; text-align: center;
+}
+.next-card h2 { font-family: var(--sans); font-size: 1.8rem; font-weight: 700; color: var(--text); margin-bottom: .5rem; }
+.next-card p  { font-family: var(--sans); font-size: .9rem; color: var(--muted); }
+
+/* ─── SCROLLABLE TABLE WRAPPER ─────────────────────── */
+.tbl-wrap { overflow-x: auto; border-radius: .5rem; border: 1px solid var(--border); }
+
+/* body text */
+.body-text { font-family: var(--sans); font-size: .88rem; color: var(--muted); line-height: 1.7; }
+.body-text strong { color: var(--text); }
+
+/* indent note */
+.note {
+  font-family: var(--mono); font-size: .72rem; color: var(--muted);
+  padding: .6rem 1rem; border-left: 2px solid var(--border);
+  margin-top: .3rem; background: var(--card); border-radius: 0 .4rem .4rem 0;
+}
+.note.accent { border-left-color: var(--accent); color: var(--text); }
+
+/* ─── QUIZ Q-NUM INLINE CODE ─────────────────────── */
+.quiz-question code {
+  font-family: var(--mono); font-size: .8rem;
+  background: #f1f5f9; padding: .1rem .35rem;
+  border-radius: .25rem; color: var(--accent);
+}
+.q-code-block {
+  background: #f8fafc; border: 1px solid #e2e8f0;
+  border-radius: .45rem; padding: .8rem 1.1rem;
+  font-family: var(--mono); font-size: .78rem; line-height: 1.7;
+  color: var(--text); white-space: pre; margin: .5rem 0 .3rem;
+}
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+<div id="deck">
+
+<!-- ══════════════════════════════════════════════════
+  SLIDE 01 — TITLE
+═══════════════════════════════════════════════════ -->
+<section class="slide active" id="slide-title" data-index="0">
+  <div style="max-width:820px; padding: 5rem 4rem;">
+    <div class="title-eyebrow">2026 · 1학기 데이터론 · Week 7</div>
+    <div class="title-main">파이썬 기본문법<br><em>총 정리</em></div>
+    <div class="title-sub">Python Essentials Review — 6주간의 여정을 하나로</div>
+    <div class="title-tags">
+      <span class="title-tag">데이터형</span>
+      <span class="title-tag">컬렉션</span>
+      <span class="title-tag">연산자</span>
+      <span class="title-tag">제어문</span>
+      <span class="title-tag">함수</span>
+      <span class="title-tag">예외처리</span>
+      <span class="title-tag">정규표현식</span>
+    </div>
+    <div class="title-info">
+      강의자 <span>JeongYun Lee</span>&nbsp;&nbsp;|&nbsp;&nbsp;
+      이메일 <span>cathx618@cau.ac.kr</span>&nbsp;&nbsp;|&nbsp;&nbsp;
+      슬라이드 <span>15장</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+  SLIDE 02 — BIG PICTURE
+═══════════════════════════════════════════════════ -->
+<section class="slide" data-index="1">
+  <div class="slide-header">
+    <div><div class="tag">Overview</div><h1>6주 여정 <span>한눈에 보기</span></h1></div>
+    <div class="slide-num">02 / 15</div>
+  </div>
+  <div class="slide-body">
+    <div class="body-text">
+      파이썬 프로그램은 아래 흐름으로 동작합니다. 지금까지 배운 것들이 바로 이 퍼즐 조각들입니다.
+    </div>
+    <div class="flow" style="margin: .5rem 0;">
+      <div class="flow-item"><span class="fi-label">Week 2</span>데이터형<br>변수</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item"><span class="fi-label">Week 2</span>연산자<br>표현식</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item"><span class="fi-label">Week 3</span>컬렉션<br>자료구조</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item"><span class="fi-label">Week 4</span>제어문<br>if/for/while</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item"><span class="fi-label">Week 5</span>함수<br>재사용</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item"><span class="fi-label">Week 6</span>예외처리<br>정규표현식</div>
+    </div>
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-title">"언제 뭘 쓰나?" 판단 기준</div>
+        <table class="tbl">
+          <tr><td><span class="badge g">중복 제거</span></td><td><code>set</code></td></tr>
+          <tr><td><span class="badge b">이름표 붙이기</span></td><td><code>dict</code></td></tr>
+          <tr><td><span class="badge y">반복 안 하기</span></td><td><code>함수</code></td></tr>
+          <tr><td><span class="badge p">에러 막기</span></td><td><code>try-except</code></td></tr>
+          <tr><td><span class="badge r">숫자만 뽑기</span></td><td><code>\d+</code></td></tr>
+        </table>
+      </div>
+      <div class="card" style="grid-column: span 2;">
+        <div class="card-title">이번 주 목표</div>
+        <div class="body-text" style="font-size:.82rem; display:flex; flex-direction:column; gap:.5rem;">
+          <div>✦ &nbsp;각각의 개념이 <strong>왜 필요한지</strong> 연결해서 이해하기</div>
+          <div>✦ &nbsp;헷갈리는 개념들 <strong>나란히 비교</strong>해서 정리하기</div>
+          <div>✦ &nbsp;실제 에러 상황을 보고 <strong>원인과 해결책</strong> 찾기</div>
+          <div>✦ &nbsp;코드를 읽고 <strong>출력값을 예측</strong>하는 연습</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+  SLIDE 03 — DATA TYPES
+═══════════════════════════════════════════════════ -->
+<section class="slide" data-index="2">
+  <div class="slide-header">
+    <div><div class="tag">Week 2</div><h1>기본 <span>데이터형</span></h1></div>
+    <div class="slide-num">03 / 15</div>
+  </div>
+  <div class="slide-body">
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-title">숫자형 Numeric</div>
+        <div class="code-block"><span class="cm"># 정수</span>
+a = <span class="num">42</span>
+b = <span class="num">-10</span>
+
+<span class="cm"># 실수</span>
+c = <span class="num">3.14</span>
+
+<span class="cm"># 형 변환</span>
+<span class="fn">int</span>(<span class="num">3.9</span>)   <span class="cm"># → 3</span>
+<span class="fn">float</span>(<span class="str">"2.5"</span>) <span class="cm"># → 2.5</span>
+<span class="fn">round</span>(<span class="num">3.567</span>, <span class="num">2</span>) <span class="cm"># → 3.57</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title amber">문자형 String</div>
+        <div class="code-block">s = <span class="str">"Blackpink"</span>
+
+<span class="cm"># 인덱싱</span>
+s[<span class="num">0</span>]    <span class="cm"># → 'B'</span>
+s[<span class="num">-1</span>]   <span class="cm"># → 'k'</span>
+
+<span class="cm"># 슬라이싱</span>
+s[<span class="num">0</span>:<span class="num">5</span>]  <span class="cm"># → 'Black'</span>
+s[::<span class="num">2</span>]  <span class="cm"># → 'Bakik'</span>
+
+<span class="cm"># f-string</span>
+<span class="fn">f</span><span class="str">"안녕 {s}!"</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title green">논리형 Boolean</div>
+        <div class="code-block">a = <span class="ok">True</span>
+b = <span class="op">False</span>
+
+<span class="cm"># bool로 변환</span>
+<span class="fn">bool</span>(<span class="num">0</span>)    <span class="cm"># → False</span>
+<span class="fn">bool</span>(<span class="str">""</span>)   <span class="cm"># → False</span>
+<span class="fn">bool</span>(<span class="num">1</span>)    <span class="cm"># → True</span>
+<span class="fn">bool</span>(<span class="str">"hi"</span>) <span class="cm"># → True</span>
+
+<span class="cm"># 비교 결과는 bool</span>
+<span class="num">5</span> &gt; <span class="num">3</span>      <span class="cm"># → True</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title purple">주요 문자열 메서드</div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>메서드</th><th>설명</th><th>예시</th><th>결과</th></tr></thead>
+          <tbody>
+            <tr><td><code>upper() / lower()</code></td><td>대소문자 변환</td><td><code>"hello".upper()</code></td><td><code>"HELLO"</code></td></tr>
+            <tr><td><code>strip()</code></td><td>공백 제거</td><td><code>"  hi  ".strip()</code></td><td><code>"hi"</code></td></tr>
+            <tr><td><code>replace(a, b)</code></td><td>문자 교체</td><td><code>"hi".replace("hi","bye")</code></td><td><code>"bye"</code></td></tr>
+            <tr><td><code>split(sep)</code></td><td>분리 → 리스트</td><td><code>"a,b".split(",")</code></td><td><code>['a','b']</code></td></tr>
+            <tr><td><code>find(s)</code></td><td>위치 탐색 (없으면 -1)</td><td><code>"hello".find("l")</code></td><td><code>2</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+  SLIDE 04 — COLLECTIONS COMPARISON
+═══════════════════════════════════════════════════ -->
+<section class="slide" data-index="3">
+  <div class="slide-header">
+    <div><div class="tag">Week 3</div><h1>컬렉션 <span>특성 비교</span></h1></div>
+    <div class="slide-num">04 / 15</div>
+  </div>
+  <div class="slide-body">
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>특성</th>
+            <th style="color:#2563eb">리스트 List</th>
+            <th style="color:#16a34a">딕셔너리 Dict</th>
+            <th style="color:#7c3aed">튜플 Tuple</th>
+            <th style="color:#d97706">셋 Set</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>생성</td><td><code>[1, 2, 3]</code></td><td><code>{"k": "v"}</code></td><td><code>(1, 2, 3)</code></td><td><code>{1, 2, 3}</code></td></tr>
+          <tr><td>순서 보장</td><td><span class="badge g">✓ 있음</span></td><td><span class="badge g">✓ 있음 (3.7+)</span></td><td><span class="badge g">✓ 있음</span></td><td><span class="badge r">✗ 없음</span></td></tr>
+          <tr><td>중복 허용</td><td><span class="badge g">✓ 가능</span></td><td>키 <span class="badge r">✗</span>&nbsp; 값 <span class="badge g">✓</span></td><td><span class="badge g">✓ 가능</span></td><td><span class="badge r">✗ 불가</span></td></tr>
+          <tr><td>변경 가능 (mutable)</td><td><span class="badge g">✓ 가능</span></td><td><span class="badge g">✓ 가능</span></td><td><span class="badge r">✗ immutable</span></td><td><span class="badge g">✓ 가능</span></td></tr>
+          <tr><td>인덱싱</td><td><span class="badge b">lst[0]</span></td><td><span class="badge b">dct['key']</span></td><td><span class="badge b">tpl[0]</span></td><td><span class="badge r">✗ 불가</span></td></tr>
+          <tr><td>주요 사용처</td><td>순서 있는 목록</td><td>키-값 매핑</td><td>변경 불가 데이터</td><td>중복 제거, 집합</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">튜플 활용 팁</div>
+        <div class="code-block"><span class="cm"># 변경 불가 → 좌표, 색상값 등에 적합</span>
+point = (<span class="num">3</span>, <span class="num">7</span>)
+x, y = point  <span class="cm"># 언패킹</span>
+
+<span class="cm"># 딕셔너리 키로 사용 가능</span>
+d = {(<span class="num">0</span>,<span class="num">0</span>): <span class="str">"origin"</span>}</div>
+      </div>
+      <div class="card">
+        <div class="card-title amber">셋 집합 연산</div>
+        <div class="code-block">a = {<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>}
+b = {<span class="num">2</span>,<span class="num">3</span>,<span class="num">4</span>}
+
+a | b  <span class="cm"># 합집합 → {1,2,3,4}</span>
+a &amp; b  <span class="cm"># 교집합 → {2,3}</span>
+a - b  <span class="cm"># 차집합 → {1}</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+  SLIDE 05 — COLLECTION METHODS
+═══════════════════════════════════════════════════ -->
+<section class="slide" data-index="4">
+  <div class="slide-header">
+    <div><div class="tag">Week 3</div><h1>컬렉션 <span>메서드 비교</span></h1></div>
+    <div class="slide-num">05 / 15</div>
+  </div>
+  <div class="slide-body">
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>동작</th>
+            <th style="color:#2563eb">리스트</th>
+            <th style="color:#16a34a">딕셔너리</th>
+            <th style="color:#7c3aed">튜플</th>
+            <th style="color:#d97706">셋</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>추가</td><td><code>append(x)</code><br><code>insert(i,x)</code></td><td><code>d[k] = v</code><br><code>update({k:v})</code></td><td><span class="badge r">✗ 불가</span></td><td><code>add(x)</code></td></tr>
+          <tr><td>삭제</td><td><code>remove(x)</code><br><code>pop(i)</code></td><td><code>del d[k]</code><br><code>pop(k)</code></td><td><span class="badge r">✗ 불가</span></td><td><code>remove(x)</code><br><code>discard(x)</code></td></tr>
+          <tr><td>수정</td><td><code>lst[i] = x</code></td><td><code>d[k] = v</code></td><td><span class="badge r">✗ 불가</span></td><td><span class="badge r">✗ 불가</span></td></tr>
+          <tr><td>검색/접근</td><td><code>lst[i]</code><br><code>lst[a:b]</code></td><td><code>d[k]</code><br><code>d.get(k, 기본값)</code></td><td><code>tpl[i]</code></td><td><code>k in s</code></td></tr>
+          <tr><td>개수</td><td><code>len(lst)</code></td><td><code>len(d)</code></td><td><code>len(tpl)</code></td><td><code>len(s)</code></td></tr>
+          <tr><td>기타</td><td><code>sort()</code><br><code>reverse()</code></td><td><code>keys()</code><br><code>values()</code><br><code>items()</code></td><td><code>count(x)</code><br><code>index(x)</code></td><td><code>union()</code><br><code>intersection()</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note accent">💡 <strong>remove vs discard</strong> — remove(x)는 x가 없으면 ValueError 발생. discard(x)는 없어도 에러 없이 조용히 넘어감.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+  SLIDE 06 — OPERATORS
+═══════════════════════════════════════════════════ -->
+<section class="slide" data-index="5">
+  <div class="slide-header">
+    <div><div class="tag">Week 2</div><h1><span>연산자</span> 총정리</h1></div>
+    <div class="slide-num">06 / 15</div>
+  </div>
+  <div class="slide-body">
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-title">산술 연산자</div>
+        <table class="tbl">
+          <thead><tr><th>연산자</th><th>의미</th><th>예시</th><th>결과</th></tr></thead>
+          <tbody>
+            <tr><td><code>+</code></td><td>더하기</td><td><code>5+6</code></td><td><code>11</code></td></tr>
+            <tr><td><code>-</code></td><td>빼기</td><td><code>8-3</code></td><td><code>5</code></td></tr>
+            <tr><td><code>*</code></td><td>곱하기</td><td><code>3*4</code></td><td><code>12</code></td></tr>
+            <tr><td><code>/</code></td><td>나누기</td><td><code>10/4</code></td><td><code>2.5</code></td></tr>
+            <tr><td><code>**</code></td><td>제곱</td><td><code>2**3</code></td><td><code>8</code></td></tr>
+            <tr><td><code>//</code></td><td>몫</td><td><code>7//4</code></td><td><code>1</code></td></tr>
+            <tr><td><code>%</code></td><td>나머지</td><td><code>7%4</code></td><td><code>3</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-title amber">비교 연산자</div>
+        <table class="tbl">
+          <thead><tr><th>연산자</th><th>의미</th><th>결과 예시</th></tr></thead>
+          <tbody>
+            <tr><td><code>==</code></td><td>같다</td><td><code>5==5 → True</code></td></tr>
+            <tr><td><code>!=</code></td><td>다르다</td><td><code>5!=3 → True</code></td></tr>
+            <tr><td><code>&lt;</code></td><td>작다</td><td><code>3&lt;5 → True</code></td></tr>
+            <tr><td><code>&lt;=</code></td><td>작거나 같다</td><td><code>5&lt;=5 → True</code></td></tr>
+            <tr><td><code>&gt;</code></td><td>크다</td><td><code>5&gt;3 → True</code></td></tr>
+            <tr><td><code>&gt;=</code></td><td>크거나 같다</td><td><code>7&gt;=6 → True</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-title green">논리 연산자</div>
+        <table class="tbl">
+          <thead><tr><th>연산자</th><th>설명</th></tr></thead>
+          <tbody>
+            <tr><td><code>and</code></td><td>모두 참 → True</td></tr>
+            <tr><td><code>or</code></td><td>하나라도 참 → True</td></tr>
+            <tr><td><code>not</code></td><td>참↔거짓 반전</td></tr>
+            <tr><td><code>in</code></td><td>포함 여부 True/False</td></tr>
+            <tr><td><code>not in</code></td><td>미포함 여부</td></tr>
+          </tbody>
+        </table>
+        <div class="code-block" style="margin-top:.8rem; font-size:.75rem;"><span class="cm"># 단락 평가 (short-circuit)</span>
+<span class="ok">True</span> <span class="kw">or</span> x   <span class="cm"># x 평가 안 함</span>
+<span class="op">False</span> <span class="kw">and</span> x <span class="cm"># x 평가 안 함</span></div>
+      </div>
+    </div>
+    <div class="note accent">💡 <strong>변수 명명 규칙</strong> — 영문·숫자·밑줄(_) 사용 / 숫자로 시작 불가 / 예약어 사용 불가 (if, for, while, def, class …) / 대소문자 구분</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+  SLIDE 07 — CONTROL FLOW
+═══════════════════════════════════════════════════ -->
+<section class="slide" data-index="6">
+  <div class="slide-header">
+    <div><div class="tag">Week 4</div><h1>제어문 <span>if / for / while</span></h1></div>
+    <div class="slide-num">07 / 15</div>
+  </div>
+  <div class="slide-body">
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-title">if 조건문</div>
+        <div class="code-block"><span class="kw">if</span> score &gt;= <span class="num">90</span>:
+    <span class="fn">print</span>(<span class="str">'A'</span>)
+<span class="kw">elif</span> score &gt;= <span class="num">80</span>:
+    <span class="fn">print</span>(<span class="str">'B'</span>)
+<span class="kw">elif</span> score &gt;= <span class="num">70</span>:
+    <span class="fn">print</span>(<span class="str">'C'</span>)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="str">'재시험ㅜ'</span>)
+
+<span class="cm"># in과 함께</span>
+a = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>]
+<span class="kw">if</span> <span class="num">1</span> <span class="kw">in</span> a <span class="kw">and</span> <span class="num">5</span> <span class="kw">not in</span> a:
+    <span class="fn">print</span>(<span class="str">"ok"</span>)</div>
+      </div>
+      <div class="card">
+        <div class="card-title amber">for 반복문</div>
+        <div class="code-block"><span class="cm"># 리스트 순회</span>
+<span class="kw">for</span> fruit <span class="kw">in</span> [<span class="str">'apple'</span>,<span class="str">'banana'</span>]:
+    <span class="fn">print</span>(fruit)
+
+<span class="cm"># range(start, end, step)</span>
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="num">5</span>):
+    <span class="fn">print</span>(i)  <span class="cm"># 1 2 3 4</span>
+
+<span class="cm"># 중첩 for</span>
+<span class="kw">for</span> a <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>,<span class="num">4</span>):
+    <span class="kw">for</span> b <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>,<span class="num">4</span>):
+        <span class="fn">print</span>(a*b, end=<span class="str">' '</span>)</div>
+      </div>
+      <div class="card">
+        <div class="card-title green">while 반복문</div>
+        <div class="code-block">num = <span class="num">1</span>
+<span class="kw">while</span> num &lt;= <span class="num">5</span>:
+    <span class="fn">print</span>(num)
+    num += <span class="num">1</span>
+
+<span class="cm"># break / continue</span>
+i = <span class="num">0</span>
+<span class="kw">while</span> <span class="ok">True</span>:
+    i += <span class="num">1</span>
+    <span class="kw">if</span> i % <span class="num">2</span> == <span class="num">0</span>:
+        <span class="kw">continue</span> <span class="cm"># 짝수 건너뜀</span>
+    <span class="fn">print</span>(i)
+    <span class="kw">if</span> i &gt;= <span class="num">5</span>:
+        <span class="kw">break</span> <span class="cm"># → 1 3 5</span></div>
+      </div>
+    </div>
+    <div class="grid-2" style="margin-top:.2rem;">
+      <div class="note accent">💡 <strong>for vs while 선택 기준</strong> — 반복 횟수나 범위를 알면 <code>for</code>, 조건이 언제 끝날지 모르면 <code>while</code></div>
+      <div class="note accent">💡 <strong>range(end) 주의</strong> — end는 포함되지 않음. <code>range(1, 5)</code>는 1, 2, 3, 4까지만.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+  SLIDE 08 — FUNCTIONS
+═══════════════════════════════════════════════════ -->
+<section class="slide" data-index="7">
+  <div class="slide-header">
+    <div><div class="tag">Week 5</div><h1>함수 <span>def · lambda · 변수 범위</span></h1></div>
+    <div class="slide-num">08 / 15</div>
+  </div>
+  <div class="slide-body">
+    <div class="vs-split">
+      <div class="card">
+        <div class="card-title">def 함수</div>
+        <div class="code-block"><span class="kw">def</span> <span class="fn">get_area</span>(radius):
+    area = <span class="num">3.14</span> * radius ** <span class="num">2</span>
+    <span class="kw">return</span> area
+
+<span class="fn">get_area</span>(<span class="num">2</span>)  <span class="cm"># → 12.56</span>
+
+<span class="cm"># 기본값 매개변수</span>
+<span class="kw">def</span> <span class="fn">greet</span>(name, lang=<span class="str">"Korean"</span>):
+    <span class="fn">print</span>(<span class="fn">f</span><span class="str">"안녕 {name}"</span>)
+
+<span class="fn">greet</span>(<span class="str">"지수"</span>)
+<span class="fn">greet</span>(<span class="str">"Lisa"</span>, <span class="str">"English"</span>)</div>
+      </div>
+      <div class="vs-divider">
+        <div class="vs-badge">VS</div>
+      </div>
+      <div class="card">
+        <div class="card-title amber">lambda 함수</div>
+        <div class="code-block"><span class="cm"># 한 줄 익명 함수</span>
+f = <span class="kw">lambda</span> x: x + <span class="num">10</span>
+f(<span class="num">5</span>)  <span class="cm"># → 15</span>
+
+<span class="cm"># map과 함께</span>
+nums = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>]
+result = <span class="fn">list</span>(<span class="fn">map</span>(
+    <span class="kw">lambda</span> x: x * <span class="num">2</span>, nums
+))
+<span class="cm"># → [2, 4, 6]</span>
+
+<span class="cm"># 차이점: return 없이 반환</span>
+<span class="cm"># 줄바꿈 불가, 이름 없음</span></div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title purple">⚠️ return vs print</div>
+        <div class="code-block"><span class="kw">def</span> <span class="fn">with_return</span>(x):
+    <span class="kw">return</span> x * <span class="num">2</span>   <span class="cm"># 값을 돌려줌</span>
+
+<span class="kw">def</span> <span class="fn">with_print</span>(x):
+    <span class="fn">print</span>(x * <span class="num">2</span>)   <span class="cm"># 화면에만 출력</span>
+
+a = <span class="fn">with_return</span>(<span class="num">5</span>)  <span class="cm"># a = 10 ✓</span>
+b = <span class="fn">with_print</span>(<span class="num">5</span>)   <span class="cm"># b = None ✗</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title red">⚠️ 변수 범위 (Scope)</div>
+        <div class="code-block">count = <span class="num">0</span>  <span class="cm"># 전역변수</span>
+
+<span class="kw">def</span> <span class="fn">wrong</span>():
+    count = count + <span class="num">1</span>  <span class="cm"># ❌ 에러!</span>
+
+<span class="kw">def</span> <span class="fn">correct</span>():
+    <span class="kw">global</span> count       <span class="cm"># ✓</span>
+    count = count + <span class="num">1</span>
+
+<span class="cm"># 더 좋은 방법 (global 없이)</span>
+<span class="kw">def</span> <span class="fn">better</span>(count):
+    <span class="kw">return</span> count + <span class="num">1</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+  SLIDE 09 — ERROR PATTERNS
+═══════════════════════════════════════════════════ -->
+<section class="slide" data-index="8">
+  <div class="slide-header">
+    <div><div class="tag">실전</div><h1>자주 만나는 <span>에러 패턴</span></h1></div>
+    <div class="slide-num">09 / 15</div>
+  </div>
+  <div class="slide-body">
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>에러 종류</th><th>발생 상황</th><th>에러 코드 예시</th><th>해결 방법</th></tr></thead>
+        <tbody class="err-row">
+          <tr>
+            <td><code>TypeError</code></td>
+            <td>다른 타입끼리 연산</td>
+            <td><code>"나이: " + 20</code></td>
+            <td><code>f"나이: {20}"</code> 또는 <code>str(20)</code></td>
+          </tr>
+          <tr>
+            <td><code>IndexError</code></td>
+            <td>리스트 범위 초과</td>
+            <td><code>lst = [1,2,3]; lst[5]</code></td>
+            <td>인덱스 범위 확인, <code>len(lst)</code> 활용</td>
+          </tr>
+          <tr>
+            <td><code>KeyError</code></td>
+            <td>딕셔너리에 없는 키</td>
+            <td><code>d = {"a":1}; d["b"]</code></td>
+            <td><code>d.get("b", 기본값)</code> 사용</td>
+          </tr>
+          <tr>
+            <td><code>NameError</code></td>
+            <td>정의 안 된 변수 사용</td>
+            <td><code>print(x)</code> (x 선언 전)</td>
+            <td>변수 선언 여부 확인</td>
+          </tr>
+          <tr>
+            <td><code>ValueError</code></td>
+            <td>잘못된 값 변환</td>
+            <td><code>int("hello")</code></td>
+            <td><code>try-except ValueError</code>로 처리</td>
+          </tr>
+          <tr>
+            <td><code>ZeroDivisionError</code></td>
+            <td>0으로 나누기</td>
+            <td><code>10 / 0</code></td>
+            <td>조건 체크 또는 <code>try-except</code></td>
+          </tr>
+          <tr>
+            <td><code>AttributeError</code></td>
+            <td>없는 메서드 호출</td>
+            <td><code>(1,2,3).append(4)</code></td>
+            <td>자료형 확인 (튜플은 append 없음)</td>
+          </tr>
+          <tr>
+            <td><code>IndentationError</code></td>
+            <td>들여쓰기 오류</td>
+            <td>if 블록 후 들여쓰기 불일치</td>
+            <td>스페이스 4칸 또는 탭 1개로 통일</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note accent">💡 에러 메시지를 보면 <strong>마지막 줄</strong>부터 읽으세요. 에러 종류와 줄 번호가 나와 있습니다.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+  SLIDE 10 — TRY-EXCEPT
+═══════════════════════════════════════════════════ -->
+<section class="slide" data-index="9">
+  <div class="slide-header">
+    <div><div class="tag">Week 6</div><h1>예외처리 <span>try · except · else · finally</span></h1></div>
+    <div class="slide-num">10 / 15</div>
+  </div>
+  <div class="slide-body">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">구조 & 실행 흐름</div>
+        <div class="code-block"><span class="kw">try</span>:
+    x = <span class="fn">int</span>(<span class="fn">input</span>(<span class="str">"숫자 입력: "</span>))
+    result = <span class="num">10</span> / x
+
+<span class="kw">except</span> <span class="op">ValueError</span>:
+    <span class="fn">print</span>(<span class="str">"숫자를 입력해주세요"</span>)
+
+<span class="kw">except</span> <span class="op">ZeroDivisionError</span>:
+    <span class="fn">print</span>(<span class="str">"0으로 나눌 수 없습니다"</span>)
+
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="str">"결과:"</span>, result)  <span class="cm"># 예외 없을 때</span>
+
+<span class="kw">finally</span>:
+    <span class="fn">print</span>(<span class="str">"종료"</span>)  <span class="cm"># 항상 실행</span></div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:1rem;">
+        <div class="card">
+          <div class="card-title amber">raise — 강제 예외 발생</div>
+          <div class="code-block"><span class="kw">def</span> <span class="fn">check_age</span>(age):
+    <span class="kw">if</span> age &lt; <span class="num">0</span>:
+        <span class="kw">raise</span> <span class="op">ValueError</span>(
+            <span class="str">"나이는 0 이상이어야 합니다"</span>
+        )
+    <span class="fn">print</span>(<span class="str">"나이:"</span>, age)
+
+<span class="fn">check_age</span>(-<span class="num">5</span>)  <span class="cm"># ValueError 발생</span></div>
+        </div>
+        <div class="card">
+          <div class="card-title green">각 블록 실행 조건</div>
+          <table class="tbl">
+            <thead><tr><th>블록</th><th>실행 조건</th></tr></thead>
+            <tbody>
+              <tr><td><code>try</code></td><td>항상 시도</td></tr>
+              <tr><td><code>except</code></td><td>예외 발생 시</td></tr>
+              <tr><td><code>else</code></td><td>예외 없을 때만</td></tr>
+              <tr><td><code>finally</code></td><td>예외와 무관하게 항상</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+  SLIDE 11 — REGEX
+═══════════════════════════════════════════════════ -->
+<section class="slide" data-index="10">
+  <div class="slide-header">
+    <div><div class="tag">Week 6</div><h1>정규표현식 <span>re 모듈</span></h1></div>
+    <div class="slide-num">11 / 15</div>
+  </div>
+  <div class="slide-body">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">주요 함수</div>
+        <table class="tbl">
+          <thead><tr><th>함수</th><th>설명</th><th>결과</th></tr></thead>
+          <tbody>
+            <tr><td><code>re.search()</code></td><td>처음 1개 탐색</td><td>Match or None</td></tr>
+            <tr><td><code>re.findall()</code></td><td>모두 탐색</td><td>리스트</td></tr>
+            <tr><td><code>re.match()</code></td><td>시작부터 검사</td><td>Match or None</td></tr>
+            <tr><td><code>re.sub()</code></td><td>교체</td><td>문자열</td></tr>
+            <tr><td><code>re.split()</code></td><td>패턴 기준 분리</td><td>리스트</td></tr>
+          </tbody>
+        </table>
+        <div class="code-block" style="margin-top:.8rem;"><span class="kw">import</span> re
+text = <span class="str">"키 180cm 몸무게 70kg"</span>
+re.<span class="fn">findall</span>(<span class="fn">r</span><span class="str">"\d+"</span>, text)
+<span class="cm"># → ['180', '70']</span>
+re.<span class="fn">sub</span>(<span class="fn">r</span><span class="str">"\d+"</span>, <span class="str">"X"</span>, text)
+<span class="cm"># → '키 Xcm 몸무게 Xkg'</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title amber">메타문자 & 수량한정자</div>
+        <table class="tbl">
+          <thead><tr><th>기호</th><th>의미</th><th>예시</th></tr></thead>
+          <tbody>
+            <tr><td><code>\d</code></td><td>숫자 하나</td><td><code>\d+</code> → 1개 이상의 숫자</td></tr>
+            <tr><td><code>\w</code></td><td>문자/숫자</td><td><code>\w+</code> → 단어</td></tr>
+            <tr><td><code>\s</code></td><td>공백</td><td><code>\s+</code> → 공백들</td></tr>
+            <tr><td><code>.</code></td><td>임의 문자 1개</td><td><code>.+</code> → 1개 이상</td></tr>
+            <tr><td><code>^</code></td><td>문자열 시작</td><td><code>^Hello</code></td></tr>
+            <tr><td><code>$</code></td><td>문자열 끝</td><td><code>\.kr$</code></td></tr>
+            <tr><td><code>[abc]</code></td><td>a 또는 b 또는 c</td><td><code>[0-9]</code></td></tr>
+            <tr><td><code>{m,n}</code></td><td>m회 이상 n회 이하</td><td><code>\d{2,4}</code></td></tr>
+          </tbody>
+        </table>
+        <div class="note" style="margin-top:.6rem;">전화번호: <code>\d{3}-\d{3,4}-\d{4}</code><br>이메일: <code>[\w.]+@[\w.]+\.\w+</code></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+  SLIDE 12 — PRACTICAL GUIDE
+═══════════════════════════════════════════════════ -->
+<section class="slide" data-index="11">
+  <div class="slide-header">
+    <div><div class="tag">총정리</div><h1>"언제 뭘 써야 하나?" <span>실용 가이드</span></h1></div>
+    <div class="slide-num">12 / 15</div>
+  </div>
+  <div class="slide-body">
+    <div class="guide-grid">
+      <div class="guide-card">
+        <div class="gc-icon">🗂️</div>
+        <div class="gc-when">순서 있는 데이터 목록이 필요할 때</div>
+        <div class="gc-arrow">→</div>
+        <div class="gc-what">list</div>
+      </div>
+      <div class="guide-card">
+        <div class="gc-icon">🏷️</div>
+        <div class="gc-when">데이터에 이름표(키)를 붙이고 싶을 때</div>
+        <div class="gc-arrow">→</div>
+        <div class="gc-what">dict</div>
+      </div>
+      <div class="guide-card">
+        <div class="gc-icon">🚫</div>
+        <div class="gc-when">중복을 제거하거나 집합 연산이 필요할 때</div>
+        <div class="gc-arrow">→</div>
+        <div class="gc-what">set</div>
+      </div>
+      <div class="guide-card">
+        <div class="gc-icon">🔒</div>
+        <div class="gc-when">변경하면 안 되는 데이터를 저장할 때</div>
+        <div class="gc-arrow">→</div>
+        <div class="gc-what">tuple</div>
+      </div>
+      <div class="guide-card">
+        <div class="gc-icon">🔁</div>
+        <div class="gc-when">같은 코드를 반복 작성하고 싶지 않을 때</div>
+        <div class="gc-arrow">→</div>
+        <div class="gc-what">함수 (def)</div>
+      </div>
+      <div class="guide-card">
+        <div class="gc-icon">🛡️</div>
+        <div class="gc-when">에러로 프로그램이 죽지 않게 하고 싶을 때</div>
+        <div class="gc-arrow">→</div>
+        <div class="gc-what">try-except</div>
+      </div>
+      <div class="guide-card">
+        <div class="gc-icon">📊</div>
+        <div class="gc-when">횟수를 알고 반복할 때</div>
+        <div class="gc-arrow">→</div>
+        <div class="gc-what">for + range()</div>
+      </div>
+      <div class="guide-card">
+        <div class="gc-icon">⏳</div>
+        <div class="gc-when">조건이 만족할 때까지 반복할 때</div>
+        <div class="gc-arrow">→</div>
+        <div class="gc-what">while</div>
+      </div>
+      <div class="guide-card">
+        <div class="gc-icon">🔍</div>
+        <div class="gc-when">문자열에서 패턴(숫자, 이메일 등)을 찾을 때</div>
+        <div class="gc-arrow">→</div>
+        <div class="gc-what">re.findall()</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+  SLIDE 13 — QUIZ BASIC (기본문제 — 객관식)
+═══════════════════════════════════════════════════ -->
+<section class="slide" data-index="12">
+  <div class="slide-header">
+    <div><div class="tag">Quiz</div><h1>기본 문제 <span>— 개념 확인 (객관식)</span></h1></div>
+    <div class="slide-num">13 / 15</div>
+  </div>
+  <div class="slide-body">
+
+    <!-- Score bar -->
+    <div class="quiz-score-bar">
+      <span class="score-label">맞힌 문제</span>
+      <span class="score-value" id="basic-score">0 / 0</span>
+      <button class="score-reset" onclick="resetBasic()">다시 풀기</button>
+    </div>
+
+    <div class="quiz-block" id="basic-quiz-block">
+
+      <!-- Q1 -->
+      <div class="quiz-item" id="bq1" data-answered="">
+        <span class="quiz-level easy">EASY 01</span>
+        <div class="quiz-question" style="white-space:normal;">다음 코드의 출력값은?
+          <div class="q-code-block">s = <span class="str">"Python"</span>
+<span class="fn">print</span>(s[<span class="num">1</span>:<span class="num">4</span>])</div>
+        </div>
+        <div class="quiz-options" data-correct="1">
+          <button class="opt-btn" onclick="checkMC('bq1',0)">① Pyt</button>
+          <button class="opt-btn" onclick="checkMC('bq1',1)">② yth</button>
+          <button class="opt-btn" onclick="checkMC('bq1',2)">③ ytho</button>
+          <button class="opt-btn" onclick="checkMC('bq1',3)">④ thon</button>
+        </div>
+        <div class="quiz-feedback" id="bq1-fb"></div>
+        <div class="quiz-explain" id="bq1-ex">
+          인덱스 1은 <span class="expl-answer">'y'</span>, 2는 <span class="expl-answer">'t'</span>, 3은 <span class="expl-answer">'h'</span> — 끝 인덱스(4)는 포함되지 않으므로 <span class="expl-answer">"yth"</span>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="quiz-item" id="bq2" data-answered="">
+        <span class="quiz-level easy">EASY 02</span>
+        <div class="quiz-question" style="white-space:normal;">다음 자료형 중 <strong>중복 값을 허용하지 않는</strong> 것은?</div>
+        <div class="quiz-options" data-correct="2">
+          <button class="opt-btn" onclick="checkMC('bq2',0)">① list</button>
+          <button class="opt-btn" onclick="checkMC('bq2',1)">② tuple</button>
+          <button class="opt-btn" onclick="checkMC('bq2',2)">③ set</button>
+          <button class="opt-btn" onclick="checkMC('bq2',3)">④ dict의 value</button>
+        </div>
+        <div class="quiz-feedback" id="bq2-fb"></div>
+        <div class="quiz-explain" id="bq2-ex">
+          <span class="expl-answer">set</span>은 집합(수학) 자료구조로, 같은 값을 두 번 넣어도 하나만 저장됩니다. <code>{1, 2, 2, 3}</code> → <code>{1, 2, 3}</code>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="quiz-item" id="bq3" data-answered="">
+        <span class="quiz-level easy">EASY 03</span>
+        <div class="quiz-question" style="white-space:normal;">다음 코드의 출력값은?
+          <div class="q-code-block"><span class="fn">print</span>(<span class="num">7</span> % <span class="num">3</span>, <span class="num">7</span> // <span class="num">3</span>)</div>
+        </div>
+        <div class="quiz-options" data-correct="0">
+          <button class="opt-btn" onclick="checkMC('bq3',0)">① 1 2</button>
+          <button class="opt-btn" onclick="checkMC('bq3',1)">② 2 1</button>
+          <button class="opt-btn" onclick="checkMC('bq3',2)">③ 3 1</button>
+          <button class="opt-btn" onclick="checkMC('bq3',3)">④ 1 3</button>
+        </div>
+        <div class="quiz-feedback" id="bq3-fb"></div>
+        <div class="quiz-explain" id="bq3-ex">
+          <code>7 % 3</code> = 나머지 = <span class="expl-answer">1</span>, &nbsp; <code>7 // 3</code> = 몫 = <span class="expl-answer">2</span>
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="quiz-item" id="bq4" data-answered="">
+        <span class="quiz-level medium">MEDIUM 04</span>
+        <div class="quiz-question" style="white-space:normal;">다음 코드를 실행하면 어떤 값이 출력될까?
+          <div class="q-code-block"><span class="kw">def</span> <span class="fn">add</span>(a, b=<span class="num">10</span>):
+    <span class="kw">return</span> a + b
+
+<span class="fn">print</span>(<span class="fn">add</span>(<span class="num">5</span>))</div>
+        </div>
+        <div class="quiz-options" data-correct="2">
+          <button class="opt-btn" onclick="checkMC('bq4',0)">① 5</button>
+          <button class="opt-btn" onclick="checkMC('bq4',1)">② 10</button>
+          <button class="opt-btn" onclick="checkMC('bq4',2)">③ 15</button>
+          <button class="opt-btn" onclick="checkMC('bq4',3)">④ 에러 발생</button>
+        </div>
+        <div class="quiz-feedback" id="bq4-fb"></div>
+        <div class="quiz-explain" id="bq4-ex">
+          <code>b</code>의 기본값이 <span class="expl-answer">10</span>이므로 <code>add(5)</code>는 <code>5 + 10 = 15</code>
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="quiz-item" id="bq5" data-answered="">
+        <span class="quiz-level medium">MEDIUM 05</span>
+        <div class="quiz-question" style="white-space:normal;">다음 코드의 출력값은?
+          <div class="q-code-block"><span class="fn">print</span>(<span class="fn">bool</span>(<span class="num">0</span>), <span class="fn">bool</span>(<span class="str">""</span>), <span class="fn">bool</span>([]))</div>
+        </div>
+        <div class="quiz-options" data-correct="1">
+          <button class="opt-btn" onclick="checkMC('bq5',0)">① True True True</button>
+          <button class="opt-btn" onclick="checkMC('bq5',1)">② False False False</button>
+          <button class="opt-btn" onclick="checkMC('bq5',2)">③ True False True</button>
+          <button class="opt-btn" onclick="checkMC('bq5',3)">④ False True False</button>
+        </div>
+        <div class="quiz-feedback" id="bq5-fb"></div>
+        <div class="quiz-explain" id="bq5-ex">
+          <span class="expl-answer">0, 빈 문자열, 빈 리스트</span>는 모두 Falsy 값입니다. 빈 컨테이너와 0, None은 False로 취급됩니다.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+  SLIDE 14 — QUIZ ADVANCED (심화문제)
+═══════════════════════════════════════════════════ -->
+<section class="slide" data-index="13">
+  <div class="slide-header">
+    <div><div class="tag">Quiz</div><h1>심화 문제 <span>— 코드 추적 & 개념 응용</span></h1></div>
+    <div class="slide-num">14 / 15</div>
+  </div>
+  <div class="slide-body">
+
+    <!-- Score bar -->
+    <div class="quiz-score-bar">
+      <span class="score-label">맞힌 문제</span>
+      <span class="score-value" id="adv-score">0 / 0</span>
+      <button class="score-reset" onclick="resetAdv()">다시 풀기</button>
+    </div>
+
+    <div class="quiz-block" id="adv-quiz-block">
+
+      <!-- AQ1 — 코드 추적 (직접 입력) -->
+      <div class="quiz-item" id="aq1" data-answered="">
+        <span class="quiz-level hard">HARD 01 — 출력값 직접 입력</span>
+        <div class="quiz-question" style="white-space:normal;">다음 코드를 실행하면 어떤 값이 출력될까? 정확하게 입력하세요.
+          <div class="q-code-block">result = []
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="num">6</span>):
+    <span class="kw">if</span> i % <span class="num">2</span> != <span class="num">0</span>:
+        result.<span class="fn">append</span>(i * i)
+<span class="fn">print</span>(result)</div>
+        </div>
+        <div class="quiz-input-row">
+          <input class="quiz-input" id="aq1-input" type="text" placeholder="출력값을 입력하세요 (예: [1, 4, 9])">
+          <button class="quiz-hint-btn" onclick="showHint('aq1')">힌트</button>
+          <button class="quiz-submit-btn" onclick="checkInput('aq1','[1, 9, 25]')">제출</button>
+        </div>
+        <div class="quiz-hint" id="aq1-hint">홀수(i%2 != 0)만 골라서 i*i(제곱)을 리스트에 추가합니다. 1~5 중 홀수는 1, 3, 5.</div>
+        <div class="quiz-feedback" id="aq1-fb"></div>
+        <div class="quiz-explain" id="aq1-ex">
+          홀수: 1→1², 3→3², 5→5² = <span class="expl-answer">1, 9, 25</span> → 출력: <span class="expl-answer">[1, 9, 25]</span>
+        </div>
+      </div>
+
+      <!-- AQ2 — 예외처리 추적 (객관식) -->
+      <div class="quiz-item" id="aq2" data-answered="">
+        <span class="quiz-level hard">HARD 02 — 예외처리 코드 추적</span>
+        <div class="quiz-question" style="white-space:normal;">다음 코드의 출력값은?
+          <div class="q-code-block">data = [<span class="str">"10"</span>, <span class="str">"abc"</span>, <span class="str">"5"</span>]
+result = []
+<span class="kw">for</span> item <span class="kw">in</span> data:
+    <span class="kw">try</span>:
+        result.<span class="fn">append</span>(<span class="fn">int</span>(item) * <span class="num">2</span>)
+    <span class="kw">except</span> <span class="op">ValueError</span>:
+        result.<span class="fn">append</span>(-<span class="num">1</span>)
+<span class="fn">print</span>(result)</div>
+        </div>
+        <div class="quiz-options" data-correct="0">
+          <button class="opt-btn" onclick="checkMC('aq2',0)">① [20, -1, 10]</button>
+          <button class="opt-btn" onclick="checkMC('aq2',1)">② [20, 0, 10]</button>
+          <button class="opt-btn" onclick="checkMC('aq2',2)">③ [10, -1, 5]</button>
+          <button class="opt-btn" onclick="checkMC('aq2',3)">④ 에러 발생</button>
+        </div>
+        <div class="quiz-feedback" id="aq2-fb"></div>
+        <div class="quiz-explain" id="aq2-ex">
+          "10"→<span class="expl-answer">int 성공→20</span>, "abc"→<span class="expl-answer">ValueError→-1</span>, "5"→<span class="expl-answer">int 성공→10</span> → <span class="expl-answer">[20, -1, 10]</span>
+        </div>
+      </div>
+
+      <!-- AQ3 — 딕셔너리 (직접 입력) -->
+      <div class="quiz-item" id="aq3" data-answered="">
+        <span class="quiz-level hard">HARD 03 — 출력값 직접 입력</span>
+        <div class="quiz-question" style="white-space:normal;">다음 코드를 실행하면 어떤 값이 출력될까?
+          <div class="q-code-block">d = {<span class="str">"a"</span>: <span class="num">1</span>, <span class="str">"b"</span>: <span class="num">2</span>}
+d[<span class="str">"c"</span>] = <span class="num">3</span>
+d[<span class="str">"a"</span>] = <span class="num">10</span>
+<span class="fn">print</span>(<span class="fn">len</span>(d), d[<span class="str">"a"</span>])</div>
+        </div>
+        <div class="quiz-input-row">
+          <input class="quiz-input" id="aq3-input" type="text" placeholder="숫자 두 개를 공백으로 구분하여 입력">
+          <button class="quiz-hint-btn" onclick="showHint('aq3')">힌트</button>
+          <button class="quiz-submit-btn" onclick="checkInput('aq3','3 10')">제출</button>
+        </div>
+        <div class="quiz-hint" id="aq3-hint">딕셔너리에 키가 이미 있으면 값이 <strong>덮어씌워집니다</strong>. 키가 새로 추가되면 항목 수가 늘어납니다.</div>
+        <div class="quiz-feedback" id="aq3-fb"></div>
+        <div class="quiz-explain" id="aq3-ex">
+          시작: {a:1, b:2} → "c" 추가: {a:1, b:2, c:3} → "a" 덮어쓰기: {a:<span class="expl-answer">10</span>, b:2, c:3}<br>
+          len(d) = <span class="expl-answer">3</span>, d["a"] = <span class="expl-answer">10</span>
+        </div>
+      </div>
+
+      <!-- AQ4 — 전역변수 scope (객관식) -->
+      <div class="quiz-item" id="aq4" data-answered="">
+        <span class="quiz-level hard">HARD 04 — 변수 범위 (Scope)</span>
+        <div class="quiz-question" style="white-space:normal;">다음 코드를 실행하면 어떤 결과가 나타날까?
+          <div class="q-code-block">x = <span class="num">5</span>
+<span class="kw">def</span> <span class="fn">func</span>():
+    x = x + <span class="num">1</span>
+    <span class="kw">return</span> x
+
+<span class="fn">print</span>(<span class="fn">func</span>())</div>
+        </div>
+        <div class="quiz-options" data-correct="2">
+          <button class="opt-btn" onclick="checkMC('aq4',0)">① 6 출력</button>
+          <button class="opt-btn" onclick="checkMC('aq4',1)">② 5 출력</button>
+          <button class="opt-btn" onclick="checkMC('aq4',2)">③ UnboundLocalError 발생</button>
+          <button class="opt-btn" onclick="checkMC('aq4',3)">④ NameError 발생</button>
+        </div>
+        <div class="quiz-feedback" id="aq4-fb"></div>
+        <div class="quiz-explain" id="aq4-ex">
+          함수 안에서 <code>x = x + 1</code>처럼 대입이 있으면 파이썬은 x를 <span class="expl-answer">지역변수</span>로 봅니다.<br>
+          하지만 오른쪽 <code>x + 1</code>을 평가할 때 지역변수 x가 아직 없어서 <span class="expl-answer">UnboundLocalError</span> 발생.<br>
+          해결: <code>global x</code>를 함수 맨 위에 선언하거나, 매개변수로 넘기기.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+  SLIDE 15 — NEXT WEEK
+═══════════════════════════════════════════════════ -->
+<section class="slide" data-index="14">
+  <div class="slide-header">
+    <div><div class="tag">Next</div><h1>다음 주부터 <span>데이터 분석</span></h1></div>
+    <div class="slide-num">15 / 15</div>
+  </div>
+  <div class="slide-body">
+    <div class="next-card">
+      <div style="font-family:var(--mono); font-size:.8rem; color:var(--accent); margin-bottom:.6rem;">Week 9 —</div>
+      <h2>pandas 시작</h2>
+      <p style="margin-top:.4rem;">지금까지 배운 파이썬 기본기로 실제 데이터를 다룹니다</p>
+    </div>
+    <div class="grid-3" style="margin-top: .2rem;">
+      <div class="card">
+        <div class="card-title">지금까지 배운 것 → pandas 연결</div>
+        <table class="tbl">
+          <tbody>
+            <tr><td>리스트</td><td>→</td><td>Series, 열(column)</td></tr>
+            <tr><td>딕셔너리</td><td>→</td><td>DataFrame 생성</td></tr>
+            <tr><td>for문</td><td>→</td><td>행 순회, apply</td></tr>
+            <tr><td>조건문</td><td>→</td><td>데이터 필터링</td></tr>
+            <tr><td>함수</td><td>→</td><td>lambda + apply</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-title amber">미리 설치해두기</div>
+        <div class="code-block"><span class="cm"># Colab에서는 이미 설치됨</span>
+<span class="cm"># 로컬이라면:</span>
+pip install pandas
+
+<span class="cm"># 사용법</span>
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+df = pd.<span class="fn">read_csv</span>(<span class="str">'data.csv'</span>)
+<span class="fn">print</span>(df.<span class="fn">head</span>())</div>
+      </div>
+      <div class="card">
+        <div class="card-title green">복습 체크리스트</div>
+        <div class="body-text" style="font-size:.8rem; display:flex; flex-direction:column; gap:.45rem;">
+          <div>☐ &nbsp;리스트와 딕셔너리 자유롭게 만들기</div>
+          <div>☐ &nbsp;for문으로 리스트 순회하기</div>
+          <div>☐ &nbsp;조건에 따라 if 분기하기</div>
+          <div>☐ &nbsp;함수 정의하고 return 사용하기</div>
+          <div>☐ &nbsp;try-except로 에러 처리하기</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div><!-- /#deck -->
+
+<!-- NAV -->
+<div id="nav">
+  <button id="btn-prev" onclick="prevSlide()" disabled>←</button>
+  <div id="slide-counter">1 / 15</div>
+  <button id="btn-next" onclick="nextSlide()">→</button>
+</div>
+<div id="kbd-hint">← → 키 또는 버튼으로 이동</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ─── SLIDE NAVIGATION ─── */
+  var slides  = document.querySelectorAll('.slide');
+  var total   = slides.length;
+  var current = 0;
+
+  function goTo(idx) {
+    if (idx < 0 || idx >= total) return;
+    slides[current].classList.remove('active');
+    slides[current].classList.add('exit');
+    var exitIdx = current;
+    setTimeout(function () { slides[exitIdx].classList.remove('exit'); }, 450);
+    current = idx;
+    slides[current].classList.add('active');
+    document.getElementById('slide-counter').textContent = (current + 1) + ' / ' + total;
+    document.getElementById('btn-prev').disabled = (current === 0);
+    document.getElementById('btn-next').disabled = (current === total - 1);
+    document.getElementById('progress-bar').style.width = ((current + 1) / total * 100) + '%';
+  }
+
+  window.nextSlide = function () { goTo(current + 1); };
+  window.prevSlide = function () { goTo(current - 1); };
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown')  { e.preventDefault(); goTo(current + 1); }
+    else if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp') { e.preventDefault(); goTo(current - 1); }
+  });
+
+  document.getElementById('progress-bar').style.width = (1 / total * 100) + '%';
+
+  /* ─── QUIZ STATE ─── */
+  var basicScore = 0, basicTotal = 0;
+  var advScore   = 0, advTotal   = 0;
+
+  /* ─── MULTIPLE CHOICE ─── */
+  window.checkMC = function (qid, chosenIdx) {
+    var qEl = document.getElementById(qid);
+    if (qEl.dataset.answered === 'true') return;
+    qEl.dataset.answered = 'true';
+
+    var optDiv      = qEl.querySelector('.quiz-options');
+    var correctIdx  = parseInt(optDiv.dataset.correct, 10);
+    var buttons     = optDiv.querySelectorAll('.opt-btn');
+    var isCorrect   = (chosenIdx === correctIdx);
+
+    buttons.forEach(function (btn, i) {
+      btn.disabled = true;
+      if (i === correctIdx) btn.classList.add('opt-correct');
+      else if (i === chosenIdx) btn.classList.add('opt-wrong');
+    });
+
+    var fb = document.getElementById(qid + '-fb');
+    fb.textContent = isCorrect ? '✓ 정답입니다!' : '✗ 오답 — 초록색으로 표시된 것이 정답입니다.';
+    fb.className   = 'quiz-feedback visible ' + (isCorrect ? 'correct' : 'wrong');
+
+    var ex = document.getElementById(qid + '-ex');
+    if (ex) ex.classList.add('visible');
+
+    /* Score update */
+    if (qid.startsWith('bq')) {
+      if (isCorrect) basicScore++;
+      basicTotal++;
+      document.getElementById('basic-score').textContent = basicScore + ' / ' + basicTotal;
+    } else {
+      if (isCorrect) advScore++;
+      advTotal++;
+      document.getElementById('adv-score').textContent = advScore + ' / ' + advTotal;
+    }
+  };
+
+  /* ─── TEXT INPUT ─── */
+  window.checkInput = function (qid, correctAnswer) {
+    var qEl = document.getElementById(qid);
+    if (qEl.dataset.answered === 'true') return;
+
+    var inputEl = document.getElementById(qid + '-input');
+    var userRaw = inputEl.value.trim();
+    if (!userRaw) return;
+
+    /* Normalize: remove all spaces for comparison */
+    var normalize = function (s) { return s.replace(/\s+/g, ''); };
+    var isCorrect = (normalize(userRaw) === normalize(correctAnswer));
+
+    qEl.dataset.answered = 'true';
+    inputEl.disabled = true;
+    var submitBtn = qEl.querySelector('.quiz-submit-btn');
+    if (submitBtn) submitBtn.disabled = true;
+
+    var fb = document.getElementById(qid + '-fb');
+    fb.textContent = isCorrect
+      ? '✓ 정답입니다!'
+      : '✗ 오답 — 정답: ' + correctAnswer;
+    fb.className = 'quiz-feedback visible ' + (isCorrect ? 'correct' : 'wrong');
+
+    var ex = document.getElementById(qid + '-ex');
+    if (ex) ex.classList.add('visible');
+
+    if (isCorrect) advScore++;
+    advTotal++;
+    document.getElementById('adv-score').textContent = advScore + ' / ' + advTotal;
+  };
+
+  /* ─── HINT ─── */
+  window.showHint = function (qid) {
+    var hint = document.getElementById(qid + '-hint');
+    if (hint) hint.classList.toggle('visible');
+  };
+
+  /* ─── RESET ─── */
+  window.resetBasic = function () {
+    basicScore = 0; basicTotal = 0;
+    document.getElementById('basic-score').textContent = '0 / 0';
+    ['bq1','bq2','bq3','bq4','bq5'].forEach(function (qid) {
+      var qEl = document.getElementById(qid);
+      if (!qEl) return;
+      qEl.dataset.answered = '';
+      qEl.querySelectorAll('.opt-btn').forEach(function (btn) {
+        btn.disabled = false;
+        btn.classList.remove('opt-correct', 'opt-wrong');
+      });
+      var fb = document.getElementById(qid + '-fb');
+      if (fb) { fb.className = 'quiz-feedback'; fb.textContent = ''; }
+      var ex = document.getElementById(qid + '-ex');
+      if (ex) ex.classList.remove('visible');
+    });
+  };
+
+  window.resetAdv = function () {
+    advScore = 0; advTotal = 0;
+    document.getElementById('adv-score').textContent = '0 / 0';
+    ['aq1','aq2','aq3','aq4'].forEach(function (qid) {
+      var qEl = document.getElementById(qid);
+      if (!qEl) return;
+      qEl.dataset.answered = '';
+
+      /* MC buttons */
+      qEl.querySelectorAll('.opt-btn').forEach(function (btn) {
+        btn.disabled = false;
+        btn.classList.remove('opt-correct', 'opt-wrong');
+      });
+
+      /* Input */
+      var inp = document.getElementById(qid + '-input');
+      if (inp) { inp.disabled = false; inp.value = ''; }
+      var sub = qEl.querySelector('.quiz-submit-btn');
+      if (sub) sub.disabled = false;
+
+      var fb = document.getElementById(qid + '-fb');
+      if (fb) { fb.className = 'quiz-feedback'; fb.textContent = ''; }
+      var ex = document.getElementById(qid + '-ex');
+      if (ex) ex.classList.remove('visible');
+      var hint = document.getElementById(qid + '-hint');
+      if (hint) hint.classList.remove('visible');
+    });
+  };
+
+  /* ─── ENTER KEY submits text input ─── */
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && document.activeElement.classList.contains('quiz-input')) {
+      var input = document.activeElement;
+      var qItem = input.closest('.quiz-item');
+      if (!qItem) return;
+      var submitBtn = qItem.querySelector('.quiz-submit-btn');
+      if (submitBtn && !submitBtn.disabled) submitBtn.click();
+    }
+  });
+
+})();
+</script>
+
+</body>
+</html>
