@@ -72,7 +72,7 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg);
 
 /* ─── SLIDE BODY ───────────────────────────────────── */
 .slide-body {
-  flex: 1; padding: 2rem 3.5rem 1.5rem;
+  flex: 1; padding: 2rem 3.5rem 4.5rem;
   overflow-y: auto; display: flex; flex-direction: column; gap: 1.4rem;
   background: var(--bg);
 }
@@ -81,24 +81,29 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg);
 
 /* ─── NAV ──────────────────────────────────────────── */
 #nav {
-  position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%);
-  display: flex; align-items: center; gap: .8rem;
-  background: rgba(255,255,255,.92); border: 1px solid var(--border);
-  border-radius: 3rem; padding: .6rem 1.2rem;
-  backdrop-filter: blur(12px); z-index: 100;
-  box-shadow: 0 4px 20px rgba(0,0,0,.08);
+  position: fixed; bottom: 1.4rem; left: 50%; transform: translateX(-50%);
+  display: flex; align-items: center; gap: .5rem;
+  background: rgba(255,255,255,.82); border: 1px solid var(--border);
+  border-radius: 3rem; padding: .35rem .85rem;
+  backdrop-filter: blur(14px); z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,.07);
+  /* 평소엔 흐리게, 활성화 시 선명하게 */
+  opacity: .18;
+  transition: opacity .35s ease;
 }
+#nav:hover,
+#nav.nav-visible { opacity: 1; }
 #nav button {
   background: none; border: none; cursor: pointer;
-  color: var(--muted); font-size: 1.1rem; padding: .3rem .6rem;
+  color: var(--muted); font-size: .95rem; padding: .28rem .55rem;
   border-radius: .4rem; transition: color .2s, background .2s;
   font-family: var(--mono);
 }
 #nav button:hover { color: var(--accent); background: rgba(13,148,136,.08); }
 #nav button:disabled { opacity: .25; cursor: default; }
 #slide-counter {
-  font-family: var(--mono); font-size: .78rem; color: var(--muted);
-  min-width: 4rem; text-align: center;
+  font-family: var(--mono); font-size: .72rem; color: var(--muted);
+  min-width: 3.4rem; text-align: center;
 }
 #progress-bar {
   position: fixed; top: 0; left: 0; height: 3px;
@@ -421,6 +426,46 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg);
 /* ─── ERROR TABLE HIGHLIGHT ────────────────────────── */
 .err-row td:first-child code { color: var(--accent3); }
 
+/* ─── MINI SPREADSHEET ─────────────────────────────── */
+.op-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: .75rem; padding: 1.1rem 1.3rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,.04);
+}
+.op-card-title {
+  font-family: var(--sans); font-size: .82rem; font-weight: 600;
+  color: var(--text); margin-bottom: .65rem;
+  display: flex; align-items: center; gap: .45rem;
+}
+.op-emoji { font-size: 1rem; }
+.op-visual {
+  display: flex; align-items: flex-start; gap: .5rem;
+}
+.op-arrow {
+  color: var(--accent); font-size: .95rem;
+  padding-top: 1.1rem; flex-shrink: 0; font-weight: 700;
+}
+.mini-sheet {
+  border-collapse: collapse; font-family: var(--mono);
+  font-size: .66rem; flex: 1;
+}
+.mini-sheet th {
+  background: #e2e8f0; color: #475569; font-weight: 600;
+  padding: .2rem .5rem; border: 1px solid #cbd5e1; text-align: center;
+}
+.mini-sheet td {
+  padding: .18rem .5rem; border: 1px solid #e2e8f0;
+  color: var(--text); text-align: center; white-space: nowrap;
+}
+.c-hi  { background: #dcfce7; color: #166534; font-weight: 600; }  /* 초록 — 선택/결과 */
+.c-del { background: #fef2f2; color: #dc2626; opacity: .55; }       /* 빨강 — 제거됨 */
+.c-new { background: #e0f2fe; color: #0369a1; font-weight: 600; }   /* 파랑 — 새로 추가 */
+.c-mt  { background: #fefce8; color: #b45309; font-style: italic; } /* 노랑 — 빈 값 */
+.op-desc {
+  font-family: var(--sans); font-size: .74rem; color: var(--muted);
+  margin-top: .6rem; line-height: 1.55;
+}
+
 /* ─── NEXT WEEK CARD ───────────────────────────────── */
 .next-card {
   background: linear-gradient(135deg, rgba(13,148,136,.06), rgba(124,58,237,.06));
@@ -457,6 +502,78 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg);
   font-family: var(--mono); font-size: .78rem; line-height: 1.7;
   color: var(--text); white-space: pre; margin: .5rem 0 .3rem;
   overflow-x: auto;
+}
+
+/* ─── VISUALIZATION CHARTS ─────────────────────────── */
+.viz-section-label {
+  display: flex; align-items: center; gap: .5rem; flex-wrap: wrap;
+  font-family: var(--sans); font-size: .85rem; font-weight: 600;
+  color: var(--text); padding-bottom: .35rem; border-bottom: 2px solid var(--border);
+}
+.lib-tag {
+  display: inline-block; font-family: var(--mono); font-size: .6rem;
+  padding: .1rem .45rem; border-radius: .3rem;
+}
+.lib-mpl { background: rgba(13,148,136,.1); color: var(--accent); border: 1px solid rgba(13,148,136,.25); }
+.lib-sns { background: rgba(217,119,6,.1); color: var(--accent2); border: 1px solid rgba(217,119,6,.25); }
+.lib-ply { background: rgba(124,58,237,.1); color: var(--accent5); border: 1px solid rgba(124,58,237,.25); }
+
+.chart-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: .75rem; padding: 1rem 1.1rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,.04);
+}
+.chart-card-title {
+  font-family: var(--sans); font-size: .82rem; font-weight: 600;
+  color: var(--text); margin-bottom: .12rem;
+}
+.chart-card-sub {
+  font-family: var(--mono); font-size: .62rem; color: var(--muted); margin-bottom: .55rem;
+}
+.chart-wrap {
+  background: #fafcff; border: 1px solid #eef0f8;
+  border-radius: .4rem; padding: .5rem .5rem .25rem; position: relative;
+}
+
+/* CSS bar chart */
+.bars {
+  display: flex; align-items: flex-end; gap: .28rem; padding: 0 .1rem;
+}
+.bar { flex: 1; border-radius: .2rem .2rem 0 0; }
+.bar-x { display: flex; gap: .28rem; margin-top: .22rem; }
+.bar-x span {
+  flex: 1; text-align: center;
+  font-family: var(--mono); font-size: .56rem; color: var(--muted);
+}
+
+/* Seaborn heatmap */
+.hm-cell {
+  aspect-ratio: 1.3; border-radius: 2px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: .55rem; font-weight: 600;
+}
+
+/* Plotly fake UI */
+.plotly-toolbar {
+  display: flex; gap: .25rem; justify-content: flex-end; margin-bottom: .28rem;
+}
+.plotly-tool-btn {
+  font-size: .6rem; background: #f1f5f9;
+  border: 1px solid var(--border); border-radius: .2rem;
+  padding: .07rem .28rem; color: var(--muted); cursor: default;
+}
+.tooltip-mock {
+  position: absolute;
+  background: rgba(30,41,59,.88); color: white;
+  font-family: var(--mono); font-size: .6rem;
+  padding: .22rem .45rem; border-radius: .3rem;
+  white-space: nowrap; pointer-events: none; line-height: 1.4; z-index: 10;
+}
+.tooltip-mock::after {
+  content: ''; position: absolute; bottom: -5px; left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: rgba(30,41,59,.88); border-bottom: none;
 }
 
 /* ─── RESPONSIVE — TABLET (≤ 768px) ────────────────── */
@@ -504,9 +621,9 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg);
   .note { font-size: .68rem; }
 
   /* Nav — 터치 타깃 크게 */
-  #nav { bottom: 1.2rem; padding: .55rem 1.1rem; }
-  #nav button { font-size: 1.25rem; padding: .5rem .9rem; }
-  #slide-counter { font-size: .75rem; min-width: 3.5rem; }
+  #nav { bottom: 1rem; padding: .45rem 1rem; }
+  #nav button { font-size: 1.2rem; padding: .45rem .85rem; }
+  #slide-counter { font-size: .72rem; min-width: 3.2rem; }
 
   /* 키보드 힌트 숨김 */
   #kbd-hint { display: none; }
@@ -557,7 +674,7 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg);
   <div style="max-width:820px; padding: 5rem 4rem;">
     <div class="title-eyebrow">2026 · 1학기 데이터론 · Week 7</div>
     <div class="title-main">파이썬 기본문법<br><em>총 정리</em></div>
-    <div class="title-sub">Python Essentials Review — 6주간의 여정을 하나로</div>
+    <!-- <div class="title-sub">Python Essentials Review — 6주간의 여정을 하나로</div> -->
     <div class="title-tags">
       <span class="title-tag">데이터형</span>
       <span class="title-tag">컬렉션</span>
@@ -570,7 +687,7 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg);
     <div class="title-info">
       강의자 <span>JeongYun Lee</span>&nbsp;&nbsp;|&nbsp;&nbsp;
       이메일 <span>cathx618@cau.ac.kr</span>&nbsp;&nbsp;|&nbsp;&nbsp;
-      슬라이드 <span>15장</span>
+      슬라이드 <span>17장</span>
     </div>
   </div>
 </section>
@@ -581,7 +698,7 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg);
 <section class="slide" data-index="1">
   <div class="slide-header">
     <div><div class="tag">Overview</div><h1>6주 여정 <span>한눈에 보기</span></h1></div>
-    <div class="slide-num">02 / 15</div>
+    <div class="slide-num">02 / 17</div>
   </div>
   <div class="slide-body">
     <div class="body-text">
@@ -630,7 +747,7 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg);
 <section class="slide" data-index="2">
   <div class="slide-header">
     <div><div class="tag">Week 2</div><h1>기본 <span>데이터형</span></h1></div>
-    <div class="slide-num">03 / 15</div>
+    <div class="slide-num">03 / 17</div>
   </div>
   <div class="slide-body">
     <div class="grid-3">
@@ -702,7 +819,7 @@ b = <span class="op">False</span>
 <section class="slide" data-index="3">
   <div class="slide-header">
     <div><div class="tag">Week 3</div><h1>컬렉션 <span>특성 비교</span></h1></div>
-    <div class="slide-num">04 / 15</div>
+    <div class="slide-num">04 / 17</div>
   </div>
   <div class="slide-body">
     <div class="tbl-wrap">
@@ -755,7 +872,7 @@ a - b  <span class="cm"># 차집합 → {1}</span></div>
 <section class="slide" data-index="4">
   <div class="slide-header">
     <div><div class="tag">Week 3</div><h1>컬렉션 <span>메서드 비교</span></h1></div>
-    <div class="slide-num">05 / 15</div>
+    <div class="slide-num">05 / 17</div>
   </div>
   <div class="slide-body">
     <div class="tbl-wrap">
@@ -789,7 +906,7 @@ a - b  <span class="cm"># 차집합 → {1}</span></div>
 <section class="slide" data-index="5">
   <div class="slide-header">
     <div><div class="tag">Week 2</div><h1><span>연산자</span> 총정리</h1></div>
-    <div class="slide-num">06 / 15</div>
+    <div class="slide-num">06 / 17</div>
   </div>
   <div class="slide-body">
     <div class="grid-3">
@@ -849,7 +966,7 @@ a - b  <span class="cm"># 차집합 → {1}</span></div>
 <section class="slide" data-index="6">
   <div class="slide-header">
     <div><div class="tag">Week 4</div><h1>제어문 <span>if / for / while</span></h1></div>
-    <div class="slide-num">07 / 15</div>
+    <div class="slide-num">07 / 17</div>
   </div>
   <div class="slide-body">
     <div class="grid-3">
@@ -910,12 +1027,91 @@ i = <span class="num">0</span>
 </section>
 
 <!-- ══════════════════════════════════════════════════
-  SLIDE 08 — FUNCTIONS
+  SLIDE 08 — LIST COMPREHENSION
 ═══════════════════════════════════════════════════ -->
 <section class="slide" data-index="7">
   <div class="slide-header">
+    <div><div class="tag">Week 4</div><h1>리스트 컴프리헨션 <span>List Comprehension</span></h1></div>
+    <div class="slide-num">08 / 17</div>
+  </div>
+  <div class="slide-body">
+    <div class="vs-split">
+      <div class="card">
+        <div class="card-title">for 루프 방식 (기존)</div>
+        <div class="code-block"><span class="cm"># 각 숫자의 제곱을 리스트에 담기</span>
+squares = []
+<span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="num">6</span>):
+    squares.<span class="fn">append</span>(x ** <span class="num">2</span>)
+
+<span class="cm"># → [1, 4, 9, 16, 25]</span>
+
+<span class="cm"># 짝수만 골라 담기</span>
+evens = []
+<span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="num">10</span>):
+    <span class="kw">if</span> x % <span class="num">2</span> == <span class="num">0</span>:
+        evens.<span class="fn">append</span>(x)
+<span class="cm"># → [0, 2, 4, 6, 8]</span></div>
+      </div>
+      <div class="vs-divider">
+        <div class="vs-badge">→</div>
+      </div>
+      <div class="card">
+        <div class="card-title amber">리스트 컴프리헨션</div>
+        <div class="code-block"><span class="cm"># 구조</span>
+[<span class="hl">표현식</span> <span class="kw">for</span> <span class="hl">변수</span> <span class="kw">in</span> <span class="hl">반복가능객체</span>]
+[<span class="hl">표현식</span> <span class="kw">for</span> <span class="hl">변수</span> <span class="kw">in</span> <span class="hl">반복가능객체</span> <span class="kw">if</span> <span class="hl">조건</span>]
+
+<span class="cm"># 제곱 리스트</span>
+squares = [x ** <span class="num">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="num">6</span>)]
+<span class="cm"># → [1, 4, 9, 16, 25]</span>
+
+<span class="cm"># 조건 필터링</span>
+evens = [x <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="num">10</span>) <span class="kw">if</span> x % <span class="num">2</span> == <span class="num">0</span>]
+<span class="cm"># → [0, 2, 4, 6, 8]</span></div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title green">변환 + 필터 동시에</div>
+        <div class="code-block">words = [<span class="str">'hi'</span>, <span class="str">'hello'</span>, <span class="str">'hey'</span>]
+
+<span class="cm"># 3글자 초과인 단어만 대문자로</span>
+result = [w.<span class="fn">upper</span>()
+          <span class="kw">for</span> w <span class="kw">in</span> words
+          <span class="kw">if</span> <span class="fn">len</span>(w) &gt; <span class="num">2</span>]
+<span class="cm"># → ['HELLO', 'HEY']</span>
+
+<span class="cm"># 문자열 리스트 → 숫자 리스트</span>
+nums = [<span class="fn">int</span>(x) <span class="kw">for</span> x <span class="kw">in</span> [<span class="str">'1'</span>,<span class="str">'2'</span>,<span class="str">'3'</span>]]
+<span class="cm"># → [1, 2, 3]</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title purple">딕셔너리 · 셋 컴프리헨션</div>
+        <div class="code-block"><span class="cm"># 딕셔너리 컴프리헨션 { k: v for ... }</span>
+sq_d = {x: x**<span class="num">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="num">4</span>)}
+<span class="cm"># → {1: 1, 2: 4, 3: 9}</span>
+
+<span class="cm"># 키-값 뒤집기</span>
+d = {<span class="str">'a'</span>:<span class="num">1</span>, <span class="str">'b'</span>:<span class="num">2</span>}
+inv = {v: k <span class="kw">for</span> k, v <span class="kw">in</span> d.<span class="fn">items</span>()}
+<span class="cm"># → {1: 'a', 2: 'b'}</span>
+
+<span class="cm"># 셋 컴프리헨션 { 표현식 for ... }</span>
+unique = {x % <span class="num">3</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="num">9</span>)}
+<span class="cm"># → {0, 1, 2}</span></div>
+      </div>
+    </div>
+    <div class="note accent">💡 <strong>언제 쓸까?</strong> — 간단한 변환·필터는 컴프리헨션이 간결합니다. 로직이 복잡하거나 2단계 이상 중첩된다면 일반 for 루프가 더 읽기 쉽습니다.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+  SLIDE 09 — FUNCTIONS
+═══════════════════════════════════════════════════ -->
+<section class="slide" data-index="8">
+  <div class="slide-header">
     <div><div class="tag">Week 5</div><h1>함수 <span>def · lambda · 변수 범위</span></h1></div>
-    <div class="slide-num">08 / 15</div>
+    <div class="slide-num">09 / 17</div>
   </div>
   <div class="slide-body">
     <div class="vs-split">
@@ -991,7 +1187,7 @@ b = <span class="fn">with_print</span>(<span class="num">5</span>)   <span class
 <section class="slide" data-index="8">
   <div class="slide-header">
     <div><div class="tag">실전</div><h1>자주 만나는 <span>에러 패턴</span></h1></div>
-    <div class="slide-num">09 / 15</div>
+    <div class="slide-num">10 / 17</div>
   </div>
   <div class="slide-body">
     <div class="tbl-wrap">
@@ -1059,7 +1255,7 @@ b = <span class="fn">with_print</span>(<span class="num">5</span>)   <span class
 <section class="slide" data-index="9">
   <div class="slide-header">
     <div><div class="tag">Week 6</div><h1>예외처리 <span>try · except · else · finally</span></h1></div>
-    <div class="slide-num">10 / 15</div>
+    <div class="slide-num">11 / 17</div>
   </div>
   <div class="slide-body">
     <div class="grid-2">
@@ -1116,7 +1312,7 @@ b = <span class="fn">with_print</span>(<span class="num">5</span>)   <span class
 <section class="slide" data-index="10">
   <div class="slide-header">
     <div><div class="tag">Week 6</div><h1>정규표현식 <span>re 모듈</span></h1></div>
-    <div class="slide-num">11 / 15</div>
+    <div class="slide-num">12 / 17</div>
   </div>
   <div class="slide-body">
     <div class="grid-2">
@@ -1166,7 +1362,7 @@ re.<span class="fn">sub</span>(<span class="fn">r</span><span class="str">"\d+"<
 <section class="slide" data-index="11">
   <div class="slide-header">
     <div><div class="tag">총정리</div><h1>"언제 뭘 써야 하나?" <span>실용 가이드</span></h1></div>
-    <div class="slide-num">12 / 15</div>
+    <div class="slide-num">13 / 17</div>
   </div>
   <div class="slide-body">
     <div class="guide-grid">
@@ -1234,7 +1430,7 @@ re.<span class="fn">sub</span>(<span class="fn">r</span><span class="str">"\d+"<
 <section class="slide" data-index="12">
   <div class="slide-header">
     <div><div class="tag">Quiz</div><h1>기본 문제 <span>— 개념 확인 (객관식)</span></h1></div>
-    <div class="slide-num">13 / 15</div>
+    <div class="slide-num">14 / 17</div>
   </div>
   <div class="slide-body">
 
@@ -1349,7 +1545,7 @@ re.<span class="fn">sub</span>(<span class="fn">r</span><span class="str">"\d+"<
 <section class="slide" data-index="13">
   <div class="slide-header">
     <div><div class="tag">Quiz</div><h1>심화 문제 <span>— 코드 추적 & 개념 응용</span></h1></div>
-    <div class="slide-num">14 / 15</div>
+    <div class="slide-num">15 / 17</div>
   </div>
   <div class="slide-body">
 
@@ -1466,49 +1662,345 @@ d[<span class="str">"a"</span>] = <span class="num">10</span>
 <section class="slide" data-index="14">
   <div class="slide-header">
     <div><div class="tag">Next</div><h1>다음 주부터 <span>데이터 분석</span></h1></div>
-    <div class="slide-num">15 / 15</div>
+    <div class="slide-num">16 / 17</div>
   </div>
   <div class="slide-body">
     <div class="next-card">
       <div style="font-family:var(--mono); font-size:.8rem; color:var(--accent); margin-bottom:.6rem;">Week 9 —</div>
       <h2>pandas 시작</h2>
-      <p style="margin-top:.4rem;">지금까지 배운 파이썬 기본기로 실제 데이터를 다룹니다</p>
+      <p style="margin-top:.4rem;">엑셀에서 손으로 하던 작업들, pandas를 쓰면 코드 한 줄로 끝납니다</p>
     </div>
-    <div class="grid-3" style="margin-top: .2rem;">
-      <div class="card">
-        <div class="card-title">지금까지 배운 것 → pandas 연결</div>
-        <table class="tbl">
-          <tbody>
-            <tr><td>리스트</td><td>→</td><td>Series, 열(column)</td></tr>
-            <tr><td>딕셔너리</td><td>→</td><td>DataFrame 생성</td></tr>
-            <tr><td>for문</td><td>→</td><td>행 순회, apply</td></tr>
-            <tr><td>조건문</td><td>→</td><td>데이터 필터링</td></tr>
-            <tr><td>함수</td><td>→</td><td>lambda + apply</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="card">
-        <div class="card-title amber">미리 설치해두기</div>
-        <div class="code-block"><span class="cm"># Colab에서는 이미 설치됨</span>
-<span class="cm"># 로컬이라면:</span>
-pip install pandas
 
-<span class="cm"># 사용법</span>
-<span class="kw">import</span> pandas <span class="kw">as</span> pd
-df = pd.<span class="fn">read_csv</span>(<span class="str">'data.csv'</span>)
-<span class="fn">print</span>(df.<span class="fn">head</span>())</div>
-      </div>
-      <div class="card">
-        <div class="card-title green">복습 체크리스트</div>
-        <div class="body-text" style="font-size:.8rem; display:flex; flex-direction:column; gap:.45rem;">
-          <div>☐ &nbsp;리스트와 딕셔너리 자유롭게 만들기</div>
-          <div>☐ &nbsp;for문으로 리스트 순회하기</div>
-          <div>☐ &nbsp;조건에 따라 if 분기하기</div>
-          <div>☐ &nbsp;함수 정의하고 return 사용하기</div>
-          <div>☐ &nbsp;try-except로 에러 처리하기</div>
+    <!-- 비주얼 비교 카드 6개 -->
+    <div class="grid-2">
+
+      <!-- 1. 필터 -->
+      <div class="op-card">
+        <div class="op-card-title"><span class="op-emoji">🔍</span> 조건에 맞는 행만 보기 <span style="color:var(--muted);font-weight:400;font-size:.72rem;">— 엑셀 필터 기능</span></div>
+        <div class="op-visual">
+          <table class="mini-sheet">
+            <tr><th>이름</th><th>점수</th></tr>
+            <tr><td>지수</td><td>95</td></tr>
+            <tr class="c-del"><td>리사</td><td>72</td></tr>
+            <tr><td>제니</td><td>88</td></tr>
+            <tr class="c-del"><td>로제</td><td>65</td></tr>
+          </table>
+          <div class="op-arrow">→</div>
+          <table class="mini-sheet">
+            <tr><th>이름</th><th>점수</th></tr>
+            <tr><td class="c-hi">지수</td><td class="c-hi">95</td></tr>
+            <tr><td class="c-hi">제니</td><td class="c-hi">88</td></tr>
+          </table>
         </div>
+        <div class="op-desc">80점 이상인 학생만 남기고 나머지는 자동으로 제외됩니다.</div>
       </div>
+
+      <!-- 2. 새 열 계산 -->
+      <div class="op-card">
+        <div class="op-card-title"><span class="op-emoji">➕</span> 새 열에 수식 한 번에 채우기 <span style="color:var(--muted);font-weight:400;font-size:.72rem;">— 엑셀 수식 자동완성</span></div>
+        <div class="op-visual">
+          <table class="mini-sheet">
+            <tr><th>이름</th><th>국어</th><th>영어</th></tr>
+            <tr><td>지수</td><td>90</td><td>85</td></tr>
+            <tr><td>리사</td><td>70</td><td>80</td></tr>
+            <tr><td>제니</td><td>85</td><td>92</td></tr>
+          </table>
+          <div class="op-arrow">→</div>
+          <table class="mini-sheet">
+            <tr><th>이름</th><th>국어</th><th>영어</th><th>합계</th></tr>
+            <tr><td>지수</td><td>90</td><td>85</td><td class="c-new">175</td></tr>
+            <tr><td>리사</td><td>70</td><td>80</td><td class="c-new">150</td></tr>
+            <tr><td>제니</td><td>85</td><td>92</td><td class="c-new">177</td></tr>
+          </table>
+        </div>
+        <div class="op-desc">수식을 한 번만 작성하면 모든 행에 자동 적용됩니다.</div>
+      </div>
+
+      <!-- 3. 정렬 -->
+      <div class="op-card">
+        <div class="op-card-title"><span class="op-emoji">↕️</span> 열 기준으로 정렬 <span style="color:var(--muted);font-weight:400;font-size:.72rem;">— 엑셀 정렬 기능</span></div>
+        <div class="op-visual">
+          <table class="mini-sheet">
+            <tr><th>이름</th><th>점수</th></tr>
+            <tr><td>제니</td><td>88</td></tr>
+            <tr><td>지수</td><td>95</td></tr>
+            <tr><td>리사</td><td>72</td></tr>
+            <tr><td>로제</td><td>65</td></tr>
+          </table>
+          <div class="op-arrow">→</div>
+          <table class="mini-sheet">
+            <tr><th>이름</th><th>점수</th></tr>
+            <tr><td class="c-hi">지수</td><td class="c-hi">95</td></tr>
+            <tr><td class="c-hi">제니</td><td class="c-hi">88</td></tr>
+            <tr><td class="c-hi">리사</td><td class="c-hi">72</td></tr>
+            <tr><td class="c-hi">로제</td><td class="c-hi">65</td></tr>
+          </table>
+        </div>
+        <div class="op-desc">점수 높은 순(내림차순)으로 자동 재정렬됩니다.</div>
+      </div>
+
+      <!-- 4. 그룹별 집계 -->
+      <div class="op-card">
+        <div class="op-card-title"><span class="op-emoji">📊</span> 그룹별 평균·합계 <span style="color:var(--muted);font-weight:400;font-size:.72rem;">— 엑셀 피벗테이블</span></div>
+        <div class="op-visual">
+          <table class="mini-sheet">
+            <tr><th>반</th><th>이름</th><th>점수</th></tr>
+            <tr><td>A</td><td>지수</td><td>95</td></tr>
+            <tr><td>A</td><td>제니</td><td>88</td></tr>
+            <tr><td>B</td><td>리사</td><td>72</td></tr>
+            <tr><td>B</td><td>로제</td><td>65</td></tr>
+          </table>
+          <div class="op-arrow">→</div>
+          <table class="mini-sheet">
+            <tr><th>반</th><th>평균 점수</th></tr>
+            <tr><td class="c-hi">A반</td><td class="c-hi">91.5</td></tr>
+            <tr><td class="c-hi">B반</td><td class="c-hi">68.5</td></tr>
+          </table>
+        </div>
+        <div class="op-desc">반·부서·지역 등 그룹별 집계를 자동으로 만들어 줍니다.</div>
+      </div>
+
+      <!-- 5. 빈 값 처리 -->
+      <div class="op-card">
+        <div class="op-card-title"><span class="op-emoji">🩹</span> 빈 칸 한 번에 처리 <span style="color:var(--muted);font-weight:400;font-size:.72rem;">— 엑셀 찾아 바꾸기</span></div>
+        <div class="op-visual">
+          <table class="mini-sheet">
+            <tr><th>이름</th><th>출석일</th></tr>
+            <tr><td>지수</td><td>14</td></tr>
+            <tr><td>리사</td><td class="c-mt">빈 칸</td></tr>
+            <tr><td>제니</td><td>12</td></tr>
+            <tr><td>로제</td><td class="c-mt">빈 칸</td></tr>
+          </table>
+          <div class="op-arrow">→</div>
+          <table class="mini-sheet">
+            <tr><th>이름</th><th>출석일</th></tr>
+            <tr><td>지수</td><td>14</td></tr>
+            <tr><td>리사</td><td class="c-new">0</td></tr>
+            <tr><td>제니</td><td>12</td></tr>
+            <tr><td>로제</td><td class="c-new">0</td></tr>
+          </table>
+        </div>
+        <div class="op-desc">빈 칸을 0 또는 원하는 값으로 일괄 채우거나, 빈 행 자체를 삭제합니다.</div>
+      </div>
+
+      <!-- 6. 기초 통계 -->
+      <div class="op-card">
+        <div class="op-card-title"><span class="op-emoji">📈</span> 기초 통계 한눈에 보기 <span style="color:var(--muted);font-weight:400;font-size:.72rem;">— 엑셀 기술통계</span></div>
+        <div class="op-visual">
+          <table class="mini-sheet">
+            <tr><th>점수</th></tr>
+            <tr><td>95</td></tr>
+            <tr><td>72</td></tr>
+            <tr><td>88</td></tr>
+            <tr><td>65</td></tr>
+            <tr><td>90</td></tr>
+          </table>
+          <div class="op-arrow">→</div>
+          <table class="mini-sheet">
+            <tr><th>통계</th><th>값</th></tr>
+            <tr><td>개수</td><td class="c-hi">5</td></tr>
+            <tr><td>평균</td><td class="c-hi">82.0</td></tr>
+            <tr><td>최솟값</td><td class="c-hi">65</td></tr>
+            <tr><td>최댓값</td><td class="c-hi">95</td></tr>
+          </table>
+        </div>
+        <div class="op-desc">명령어 하나로 전체 열의 개수·평균·최솟값·최댓값을 바로 확인합니다.</div>
+      </div>
+
+    </div><!-- /grid-2 -->
+
+    <div class="note accent">💡 Colab을 사용한다면 pandas는 이미 설치되어 있습니다. <code>import pandas as pd</code> 한 줄만 쓰면 바로 시작할 수 있어요.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+  SLIDE 17 — DATA VISUALIZATION
+═══════════════════════════════════════════════════ -->
+<section class="slide" data-index="16">
+  <div class="slide-header">
+    <div><div class="tag">Week 9</div><h1>데이터 시각화 <span>차트로 인사이트 전달하기</span></h1></div>
+    <div class="slide-num">17 / 17</div>
+  </div>
+  <div class="slide-body">
+
+    <!-- ── 정적 시각화 ── -->
+    <div class="viz-section-label">
+      <span>📊 정적 시각화</span>
+      <span class="lib-tag lib-mpl">matplotlib</span>
+      <span class="lib-tag lib-sns">seaborn</span>
+      <span style="font-size:.7rem; color:var(--muted); font-family:var(--mono);">— 이미지(PNG)로 저장, 보고서·논문에 적합</span>
     </div>
+
+    <div class="grid-3">
+
+      <!-- 막대 그래프 (matplotlib) -->
+      <div class="chart-card">
+        <div class="chart-card-title">막대 그래프 <span class="lib-tag lib-mpl">matplotlib</span></div>
+        <div class="chart-card-sub">반별 평균 점수 비교</div>
+        <div class="chart-wrap">
+          <div class="bars" style="height:72px;">
+            <div class="bar" style="height:91%; background:#0d9488;"></div>
+            <div class="bar" style="height:68%; background:#0d9488;"></div>
+            <div class="bar" style="height:78%; background:#0d9488;"></div>
+            <div class="bar" style="height:85%; background:#0d9488;"></div>
+          </div>
+          <div class="bar-x"><span>A반</span><span>B반</span><span>C반</span><span>D반</span></div>
+        </div>
+        <div class="op-desc">그룹 간 크기 비교에 가장 직관적인 차트</div>
+      </div>
+
+      <!-- 선 그래프 (matplotlib) -->
+      <div class="chart-card">
+        <div class="chart-card-title">선 그래프 <span class="lib-tag lib-mpl">matplotlib</span></div>
+        <div class="chart-card-sub">월별 성적 변화 추이</div>
+        <div class="chart-wrap">
+          <svg viewBox="0 0 180 78" style="width:100%; display:block;">
+            <line x1="18" y1="6" x2="18" y2="62" stroke="#e2e8f0" stroke-width="1"/>
+            <line x1="18" y1="62" x2="174" y2="62" stroke="#e2e8f0" stroke-width="1"/>
+            <line x1="18" y1="24" x2="174" y2="24" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="3,3"/>
+            <line x1="18" y1="43" x2="174" y2="43" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="3,3"/>
+            <polyline points="24,55 56,45 88,50 120,32 152,37 172,14"
+              fill="none" stroke="#0d9488" stroke-width="2"
+              stroke-linejoin="round" stroke-linecap="round"/>
+            <circle cx="24"  cy="55" r="3" fill="white" stroke="#0d9488" stroke-width="2"/>
+            <circle cx="56"  cy="45" r="3" fill="white" stroke="#0d9488" stroke-width="2"/>
+            <circle cx="88"  cy="50" r="3" fill="white" stroke="#0d9488" stroke-width="2"/>
+            <circle cx="120" cy="32" r="3" fill="white" stroke="#0d9488" stroke-width="2"/>
+            <circle cx="152" cy="37" r="3" fill="white" stroke="#0d9488" stroke-width="2"/>
+            <circle cx="172" cy="14" r="3" fill="white" stroke="#0d9488" stroke-width="2"/>
+            <text x="24"  y="74" text-anchor="middle" font-size="7" fill="#94a3b8" font-family="monospace">1월</text>
+            <text x="56"  y="74" text-anchor="middle" font-size="7" fill="#94a3b8" font-family="monospace">2월</text>
+            <text x="88"  y="74" text-anchor="middle" font-size="7" fill="#94a3b8" font-family="monospace">3월</text>
+            <text x="120" y="74" text-anchor="middle" font-size="7" fill="#94a3b8" font-family="monospace">4월</text>
+            <text x="152" y="74" text-anchor="middle" font-size="7" fill="#94a3b8" font-family="monospace">5월</text>
+            <text x="172" y="74" text-anchor="middle" font-size="7" fill="#94a3b8" font-family="monospace">6월</text>
+          </svg>
+        </div>
+        <div class="op-desc">시간 흐름에 따른 변화·추세를 보여줄 때</div>
+      </div>
+
+      <!-- 히트맵 (seaborn) -->
+      <div class="chart-card">
+        <div class="chart-card-title">히트맵 <span class="lib-tag lib-sns">seaborn</span></div>
+        <div class="chart-card-sub">과목 간 상관관계 (색이 진할수록 관계 강함)</div>
+        <div class="chart-wrap" style="padding:.5rem .4rem;">
+          <div style="display:grid; grid-template-columns:22px repeat(4,1fr); gap:2px; margin-bottom:2px;">
+            <div></div>
+            <div style="text-align:center;font-size:.55rem;font-family:monospace;color:#64748b;">국어</div>
+            <div style="text-align:center;font-size:.55rem;font-family:monospace;color:#64748b;">영어</div>
+            <div style="text-align:center;font-size:.55rem;font-family:monospace;color:#64748b;">수학</div>
+            <div style="text-align:center;font-size:.55rem;font-family:monospace;color:#64748b;">과학</div>
+          </div>
+          <div style="display:grid; grid-template-columns:22px repeat(4,1fr); gap:2px;">
+            <div style="font-size:.55rem;font-family:monospace;color:#64748b;display:flex;align-items:center;">국어</div>
+            <div class="hm-cell" style="background:#0d9488;color:white;">1.0</div>
+            <div class="hm-cell" style="background:rgba(13,148,136,.62);color:white;">0.7</div>
+            <div class="hm-cell" style="background:rgba(13,148,136,.36);color:#0d7268;">0.4</div>
+            <div class="hm-cell" style="background:rgba(13,148,136,.24);color:#0d7268;">0.3</div>
+
+            <div style="font-size:.55rem;font-family:monospace;color:#64748b;display:flex;align-items:center;">영어</div>
+            <div class="hm-cell" style="background:rgba(13,148,136,.62);color:white;">0.7</div>
+            <div class="hm-cell" style="background:#0d9488;color:white;">1.0</div>
+            <div class="hm-cell" style="background:rgba(13,148,136,.48);color:white;">0.5</div>
+            <div class="hm-cell" style="background:rgba(13,148,136,.36);color:#0d7268;">0.4</div>
+
+            <div style="font-size:.55rem;font-family:monospace;color:#64748b;display:flex;align-items:center;">수학</div>
+            <div class="hm-cell" style="background:rgba(13,148,136,.36);color:#0d7268;">0.4</div>
+            <div class="hm-cell" style="background:rgba(13,148,136,.48);color:white;">0.5</div>
+            <div class="hm-cell" style="background:#0d9488;color:white;">1.0</div>
+            <div class="hm-cell" style="background:rgba(13,148,136,.78);color:white;">0.8</div>
+
+            <div style="font-size:.55rem;font-family:monospace;color:#64748b;display:flex;align-items:center;">과학</div>
+            <div class="hm-cell" style="background:rgba(13,148,136,.24);color:#0d7268;">0.3</div>
+            <div class="hm-cell" style="background:rgba(13,148,136,.36);color:#0d7268;">0.4</div>
+            <div class="hm-cell" style="background:rgba(13,148,136,.78);color:white;">0.8</div>
+            <div class="hm-cell" style="background:#0d9488;color:white;">1.0</div>
+          </div>
+        </div>
+        <div class="op-desc">두 변수 간의 관계 강도를 색상으로 한눈에</div>
+      </div>
+
+    </div><!-- /grid-3 -->
+
+    <!-- ── 동적 시각화 ── -->
+    <div class="viz-section-label">
+      <span>✨ 동적 시각화</span>
+      <span class="lib-tag lib-ply">plotly</span>
+      <span style="font-size:.7rem; color:var(--muted); font-family:var(--mono);">— 마우스 hover 시 상세값 표시 · 확대/축소 · 이미지 저장</span>
+    </div>
+
+    <div class="grid-2">
+
+      <!-- 동적 막대 그래프 -->
+      <div class="chart-card">
+        <div class="chart-card-title">동적 막대 그래프 <span class="lib-tag lib-ply">plotly</span></div>
+        <div class="chart-card-sub">막대 위에 마우스를 올리면 정확한 수치가 말풍선으로 표시됩니다</div>
+        <div class="chart-wrap">
+          <div class="plotly-toolbar">
+            <span class="plotly-tool-btn" title="확대">🔍</span>
+            <span class="plotly-tool-btn" title="이동">✥</span>
+            <span class="plotly-tool-btn" title="초기화">🏠</span>
+            <span class="plotly-tool-btn" title="저장">📷</span>
+          </div>
+          <div class="bars" style="height:68px; margin-bottom:.1rem;">
+            <div class="bar" style="height:91%; background:#0d9488; opacity:.75;"></div>
+            <div class="bar" style="height:68%; background:#7c3aed; box-shadow:0 0 0 2px #7c3aed, 0 0 0 3px white;"></div>
+            <div class="bar" style="height:78%; background:#0d9488; opacity:.75;"></div>
+            <div class="bar" style="height:85%; background:#0d9488; opacity:.75;"></div>
+          </div>
+          <div class="tooltip-mock" style="top:8px; left:23%;">
+            B반 평균<br><strong>68.5점</strong>
+          </div>
+          <div class="bar-x"><span>A반</span><span>B반</span><span>C반</span><span>D반</span></div>
+        </div>
+        <div class="op-desc">정적 차트와 똑같이 생겼지만, 웹에서 직접 수치를 확인하고 범위를 확대할 수 있습니다.</div>
+      </div>
+
+      <!-- 동적 산점도 -->
+      <div class="chart-card">
+        <div class="chart-card-title">동적 산점도 <span class="lib-tag lib-ply">plotly</span></div>
+        <div class="chart-card-sub">점 위에 마우스를 올리면 해당 데이터의 값을 바로 확인합니다</div>
+        <div class="chart-wrap">
+          <div class="plotly-toolbar">
+            <span class="plotly-tool-btn">🔍</span>
+            <span class="plotly-tool-btn">✥</span>
+            <span class="plotly-tool-btn">🏠</span>
+            <span class="plotly-tool-btn">📷</span>
+          </div>
+          <svg viewBox="0 0 200 80" style="width:100%; display:block;">
+            <line x1="18" y1="5" x2="18" y2="65" stroke="#e2e8f0" stroke-width="1"/>
+            <line x1="18" y1="65" x2="192" y2="65" stroke="#e2e8f0" stroke-width="1"/>
+            <line x1="18" y1="25" x2="192" y2="25" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="3,2"/>
+            <line x1="18" y1="45" x2="192" y2="45" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="3,2"/>
+            <!-- dots -->
+            <circle cx="32"  cy="57" r="4" fill="rgba(13,148,136,.65)"/>
+            <circle cx="52"  cy="50" r="4" fill="rgba(13,148,136,.65)"/>
+            <circle cx="70"  cy="44" r="4" fill="rgba(13,148,136,.65)"/>
+            <circle cx="90"  cy="38" r="4" fill="rgba(13,148,136,.65)"/>
+            <circle cx="108" cy="41" r="4" fill="rgba(13,148,136,.65)"/>
+            <circle cx="128" cy="32" r="4" fill="rgba(13,148,136,.65)"/>
+            <circle cx="148" cy="24" r="4" fill="rgba(13,148,136,.65)"/>
+            <circle cx="168" cy="28" r="4" fill="rgba(13,148,136,.65)"/>
+            <!-- highlighted dot -->
+            <circle cx="185" cy="12" r="6" fill="#7c3aed" stroke="white" stroke-width="2"/>
+            <!-- axis labels -->
+            <text x="18" y="75" text-anchor="start" font-size="7" fill="#94a3b8" font-family="monospace">공부 시간 →</text>
+            <text x="5"  y="10" text-anchor="middle" font-size="7" fill="#94a3b8" font-family="monospace" writing-mode="vertical-rl" transform="rotate(-90) translate(-40,8)">점수 →</text>
+          </svg>
+          <div class="tooltip-mock" style="top:4px; right:8px;">
+            공부: 9h<br><strong>점수: 94</strong>
+          </div>
+        </div>
+        <div class="op-desc">두 변수의 관계(상관)를 보여주며, 특이값(이상치)을 클릭해 정체를 바로 확인할 수 있습니다.</div>
+      </div>
+
+    </div><!-- /grid-2 -->
+
+    <div class="grid-2">
+      <div class="note accent">📊 <strong>matplotlib · seaborn</strong> — PNG·PDF로 저장해 보고서에 붙여넣기 좋습니다. seaborn은 통계 차트(히트맵, 박스플롯 등)를 특히 쉽게 그립니다.</div>
+      <div class="note" style="border-left-color:var(--accent5); color:var(--text);">✨ <strong>plotly</strong> — Colab에서 결과물을 공유할 때 특히 유용합니다. 받는 사람이 차트를 직접 탐색하며 원하는 값을 찾을 수 있습니다.</div>
+    </div>
+
   </div>
 </section>
 
@@ -1517,10 +2009,10 @@ df = pd.<span class="fn">read_csv</span>(<span class="str">'data.csv'</span>)
 <!-- NAV -->
 <div id="nav">
   <button id="btn-prev" onclick="prevSlide()" disabled>←</button>
-  <div id="slide-counter">1 / 15</div>
+  <div id="slide-counter">1 / 17</div>
   <button id="btn-next" onclick="nextSlide()">→</button>
 </div>
-<div id="kbd-hint">← → 키 또는 버튼으로 이동</div>
+<!-- <div id="kbd-hint">← → 키 또는 버튼으로 이동</div> -->
 
 <script>
 (function () {
@@ -1530,6 +2022,21 @@ df = pd.<span class="fn">read_csv</span>(<span class="str">'data.csv'</span>)
   var slides  = document.querySelectorAll('.slide');
   var total   = slides.length;
   var current = 0;
+  var nav     = document.getElementById('nav');
+  var navTimer;
+
+  /* nav를 잠깐 보여주고 2.5초 후 자동 숨김 */
+  function showNav() {
+    nav.classList.add('nav-visible');
+    clearTimeout(navTimer);
+    navTimer = setTimeout(function () {
+      nav.classList.remove('nav-visible');
+    }, 2500);
+  }
+
+  /* 마우스 이동 / 터치 시 nav 표시 */
+  document.addEventListener('mousemove', showNav);
+  document.addEventListener('touchstart', showNav, { passive: true });
 
   function goTo(idx) {
     if (idx < 0 || idx >= total) return;
@@ -1543,6 +2050,7 @@ df = pd.<span class="fn">read_csv</span>(<span class="str">'data.csv'</span>)
     document.getElementById('btn-prev').disabled = (current === 0);
     document.getElementById('btn-next').disabled = (current === total - 1);
     document.getElementById('progress-bar').style.width = ((current + 1) / total * 100) + '%';
+    showNav();  // 슬라이드 전환 시 nav 표시
   }
 
   window.nextSlide = function () { goTo(current + 1); };
